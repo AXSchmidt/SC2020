@@ -104,7 +104,6 @@ public class Lib {
 	
 	private static CubeCoordinates findSecondMove(GameState gameState) {
 		Board board = gameState.getBoard();
-		
 		CubeCoordinates freeField = new CubeCoordinates(0, 5, -5);
 		int maxDistance = 0;
 		

@@ -50,7 +50,7 @@ public class BeatMeBot implements IGameHandler {
    * {@inheritDoc}
    */
   public void gameEnded(GameResult data, PlayerColor color, String errorMessage) {
-    log.info("Das Spiel ist beendet.");
+    //log.info("Das Spiel ist beendet.");
   }
 
   /**
