@@ -11,5 +11,9 @@ public class Consts {
 	public static boolean PRINT_MOVE = true;
 	public static boolean PRINT_TIME = true;
 	
+	public static boolean SHOW_HEADER = true;
+	public static boolean SHOW_MOVES = true;
+	public static boolean SHOW_BOARD = true;
+	
 	public static int ALPHABETA_DEPTH = 2;	
 }

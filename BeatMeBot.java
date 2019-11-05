@@ -7,10 +7,11 @@ import sc.player2020.Starter;
 import sc.plugin2020.DragMove;
 import sc.plugin2020.GameState;
 import sc.plugin2020.IGameHandler;
+import sc.plugin2020.Field;
 import sc.plugin2020.Move;
+import sc.plugin2020.SetMove;
 import sc.plugin2020.Piece;
 import sc.plugin2020.PieceType;
-import sc.plugin2020.SetMove;
 import sc.plugin2020.util.CubeCoordinates;
 import sc.plugin2020.util.GameRuleLogic;
 import sc.plugin2020.util.Constants;
@@ -35,7 +36,9 @@ public class BeatMeBot implements IGameHandler {
   private GameState gameState;
   private Player currentPlayer;
   
+  private int aufrufe;
   private Move bestMove;
+  private String[] moveList = new String[Consts.ALPHABETA_DEPTH];
 
   /**
    * Erzeugt ein neues Strategieobjekt, das zufaellige Zuege taetigt.
@@ -79,17 +82,7 @@ public class BeatMeBot implements IGameHandler {
     // ALPHA BETA
     } else {
     	
-    	// default Move...
-        List<Move> possibleMoves = GameRuleLogic.getPossibleMoves(gameState);
-		bestMove = possibleMoves.get((int) (Math.random() * possibleMoves.size()));
-		
-		try {
-			simpleAlphaBeta(Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1, Consts.ALPHABETA_DEPTH);
-		} catch (InvalidGameStateException e) {
-			e.printStackTrace();
-		} catch (InvalidMoveException e) {
-			e.printStackTrace();
-		}
+    	startAlphaBeta();
 	    
     }
     
@@ -106,79 +99,137 @@ public class BeatMeBot implements IGameHandler {
 	
   }
   
-	private int simpleAlphaBeta(int alpha, int beta, int deep) throws InvalidGameStateException, InvalidMoveException {
+	private void startAlphaBeta() {
+		aufrufe = 0;
 
-		//ArrayList<Move> moves;
-		List<Move> moves;
-		GameState g = gameState;
+		boolean error = false;
 
-		if (deep == 0 || gameEnded()) {
-			this.gameState = g;
-			return rateSimpleAlphaBeta();
+		try {
+			// Eigentlicher Aufruf der Alphabeta
+			alphaBeta(Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1, Consts.ALPHABETA_DEPTH);
+		} catch (InvalidGameStateException e) {
+			error = true;
+			e.printStackTrace();
+		} catch (InvalidMoveException e) {
+			error = true;
+			e.printStackTrace();
 		}
-
-		moves = GameRuleLogic.getPossibleMoves(gameState);
-		if (moves.isEmpty()) {
-			this.gameState = g;
-			return rateSimpleAlphaBeta();
-		}
-
-		for (Move move : moves) {
-			int value;
-			try {
-				Lib.pln("Teste Zug: " + move.toString(), Consts.PRINT_ALPHABETA);
-				g = this.gameState.clone();
-				GameRuleLogic.performMove(gameState, move);
-				Lib.pln("Zug performed", Consts.PRINT_ALPHABETA);
-				// gameState.prepareNextTurn(move);
-				if (gameState.getCurrentPlayerColor() == g.getCurrentPlayerColor()) {
-					value = simpleAlphaBeta(alpha, beta, deep - 1);
-				} else {
-					value = simpleAlphaBeta(-beta, -alpha, deep - 1);
-				}
-				if (value >= beta) {
-					this.gameState = g;
-					return beta;
-				}
-				if (value > alpha) {
-					alpha = value;
-					if (deep == Consts.ALPHABETA_DEPTH) {
-						bestMove = move;
-					}
-				}
-				gameState = g;
-				
-				
-			} catch (InvalidGameStateException | InvalidMoveException e) {
-				e.printStackTrace();
-				System.out.println(e.getClass().getSimpleName() + move);
-				gameState = g;			
-			} catch (IndexOutOfBoundsException e) {
-				throw e;
-			} finally {
-				gameState = g;
+		// ERROR
+		if (error) {
+			if (bestMove.equals(null) == true) {
+				List<Move> possibleMoves = GameRuleLogic.getPossibleMoves(gameState);
+				bestMove = possibleMoves.get((int) (Math.random() * possibleMoves.size()));
+				Lib.pln("RND MOVE: " + bestMove.toString(), Consts.PRINT_ALPHABETA);
 			}
-
 		}
-		this.gameState = g;
-		return alpha;
 	}
 
-	private int rateSimpleAlphaBeta() {
+	private int alphaBeta(int alpha, int beta, int tiefe) throws InvalidGameStateException, InvalidMoveException {
+		++aufrufe;
+		// Abbruchkriterium
+		if ((tiefe == 0) || endOfGame()) {
+			int value = rateAlphaBeta();
+			if (Consts.SHOW_HEADER) {
+				Lib.pln("", true);
+				Lib.pln("***N*E*W***M*O*V*E***", true);
+				Lib.pln("Value: " + value + " - Tiefe: " + Consts.ALPHABETA_DEPTH + " - Aufrufe: " + aufrufe + " - Turn: "
+						+ gameState.getTurn() + " - Round: " + gameState.getRound(), true);
+			}
+			if (Consts.SHOW_MOVES) {
+				for (String moveStr : moveList) {
+					Lib.pln(moveStr, true);
+				}
+			}
+			return value;
+		}
+		boolean PVgefunden = false;
+		int best = Integer.MIN_VALUE + 1;
+		List<Move> moves = GameRuleLogic.getPossibleMoves(gameState);
 
-		// da spielertausch bei prepareNextTurn
-		PlayerColor opponent = this.gameState.getCurrentPlayer().getColor();
-		PlayerColor current = this.gameState.getOtherPlayer().getColor();
-		int ownPoints = this.gameState.getPointsForPlayer(current);
-		int oppPoints = this.gameState.getPointsForPlayer(opponent);
+		for (Move move : moves) {
+			moveList[Consts.ALPHABETA_DEPTH - tiefe] = move.toString(); //+ " "
+					//+ this.gameState.getBoard().getField(move.x, move.y).getState().toString();
+			GameState g = this.gameState.clone();
+			GameRuleLogic.performMove(this.gameState, move);
+			int wert;
+			if (PVgefunden) {
+				wert = -alphaBeta(-alpha - 1, -alpha, tiefe - 1);
+				if (wert > alpha && wert < beta)
+					wert = -alphaBeta(-beta, -wert, tiefe - 1);
+			} else
+				wert = -alphaBeta(-beta, -alpha, tiefe - 1);
+			this.gameState = g;
+			if (wert > best) {
+				if (wert >= beta)
+					return wert;
+				best = wert;
+				if (tiefe == Consts.ALPHABETA_DEPTH) {
+					// ZUG KOPIEREN? GEHT DAS SO?
+					if (move.toString().substring(0, 1).equals("S")) { // SetMove
+						SetMove setMove = (SetMove) move;
+						bestMove = new SetMove(setMove.getPiece(), move.getDestination());
+					} else {
+						DragMove dragMove = (DragMove) move;
+						bestMove = new DragMove(dragMove.getStart(), move.getDestination());
+					}
+					Lib.pln("NEW BEST MOVE: " + bestMove.toString() + " Value: " + best, Consts.PRINT_ALPHABETA);
+				}
+				if (wert > alpha) {
+					alpha = wert;
+					PVgefunden = true;
+				}
+			}
+		}
+		return best;
+	}
 
-		int value = (2 * ownPoints) - oppPoints;
+	private int rateAlphaBeta() {
+		int value = 0;
+
+		// Show Board
+		if (Consts.SHOW_BOARD) {
+			Lib.printBoard(this.gameState.getBoard());
+		}
+
+		PlayerColor current;
+		PlayerColor opponent;
+		if (Consts.ALPHABETA_DEPTH % 2 == 0) {
+			current = this.gameState.getCurrentPlayer().getColor();
+		} else {
+			current = this.gameState.getOtherPlayer().getColor();
+		}
+		opponent = current.opponent();
+
+		// Alle Zeilen durchlaufen...
+		for (int row = 0; row < 11; row++) {
+			// Alle Spalten durchrattern...
+			for (int col = 0; col < 11; col++) {
+				// x, y, z berechnen
+				int x = (int) (col - 2 - Math.round((row + 1) / 2)); 
+				int z = row - 5;
+				int y = -1 * (x + z);
+				// Nur suchen, wenn Field auf Feld liegt
+				if ((x >= -5) && (x <= 5) && (y >= -5) && (y <= 5)) {
+					Field field = this.gameState.getBoard().getField(x, y, z);
+					// Eigene Insekten
+					if (field.getOwner().toString() == current.toString()) {
+						if (field.getPieces().get(0).getType() == PieceType.ANT) {
+							value++;
+						}
+					}
+					// Gegnerische Mückenplage
+					
+				} // possible Field
+			} // of for row
+		} // of for col
 
 		return value;
 	}
 
-	private boolean gameEnded() {
-		return (this.gameState.getTurn() == Constants.ROUND_LIMIT);
+	private boolean endOfGame() {
+		// TODO Es muss noch abgefragt werden, ob ein Spieler gewonnen hat (max.
+		// Schwarmgroesse)
+		return (this.gameState.getRound() == Constants.ROUND_LIMIT);
 	}
 
   /**
