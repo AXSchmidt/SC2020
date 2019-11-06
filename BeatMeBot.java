@@ -227,20 +227,19 @@ public class BeatMeBot implements IGameHandler {
 	
 
 	private void printSummary(long timeStart) {
-		// Zugzusammenfassung ausgeben
-		if (Consts.PRINT_FOOTER) {
-			final long timeEnd = System.currentTimeMillis();
-			outPut.add("");
-			outPut.add("******************************");
-			outPut.add("");
-			outPut.add("Best Move: " + bestMove.toString());
-			outPut.add("Lauftzeit: " + (timeEnd - timeStart) + "ms. Suchtiefe " + Consts.ALPHABETA_DEPTH + " Aufrufe " + aufrufe);
-		}
-		// GESAMTAUSGABE
+		// Gesamtausgabe der AlphaBeta Logic ausgeben
 		if (Consts.PRINT_ALPHABETA) {
 			for (String s : outPut) {
 				System.out.println(s);
 			}
+		}
+		// Zugzusammenfassung ausgeben
+		if (Consts.PRINT_FOOTER) {
+			final long timeEnd = System.currentTimeMillis();
+			Lib.pln("", true);
+			Lib.pln("***S*U*M*M*A*R*Y***", true);
+			Lib.pln("  Best Move: " + bestMove.toString(), true);
+			Lib.pln("  Lauftzeit: " + (timeEnd - timeStart) + "ms. Suchtiefe " + Consts.ALPHABETA_DEPTH + " Aufrufe " + aufrufe, true);
 		}
 	}
 
