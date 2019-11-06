@@ -1,5 +1,6 @@
 package sc.player2020.logic;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import sc.plugin2020.Board;
@@ -85,7 +86,9 @@ public class Lib {
 		return Math.min(distanceLR, distanceZ);
 	}
 	
-	private static CubeCoordinates findFirstMove(Board board) {		
+	private static CubeCoordinates findFirstMove(Board board) {	
+		// TODO: Distanz zum Rand = 1 (wenn direkt daneben), ABER:
+		//       Distanz zur Beere = 0 (wenn direkt daneben)
 		CubeCoordinates freeField = new CubeCoordinates(0, 5, -5);
 		int maxDistance = 0;
 		// Alle Zeilen durchlaufen...
@@ -184,7 +187,8 @@ public class Lib {
 		} // of for col
 	}
 	
-	public static void printBoard(Board board) {
+	public static List<String> printBoard(Board board) {
+		List<String> outPut = new ArrayList<String>();
 		// Alle Zeilen durchlaufen...
 		for (int row = 0; row < 11; row++) {
 			String strRow = "";
@@ -214,7 +218,8 @@ public class Lib {
 					strRow += "  "; 				
 				}
 			} // of for row
-			System.out.println(strRow);
+			outPut.add(strRow);
 		} // of for col
+		return outPut;
 	}
 }

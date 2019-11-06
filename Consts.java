@@ -8,8 +8,7 @@ public class Consts {
 	public static boolean PRINT_HEADER = true;
 	// chronologisch kommt hier das AlphaBeta-Gedoens
 	public static boolean PRINT_BOARD = false;
-	public static boolean PRINT_MOVE = true;	
-	public static boolean PRINT_TIME = true;
+	public static boolean PRINT_FOOTER = true;	
 	
 	public static boolean PRINT_ALPHABETA = true;
 	public static boolean PRINT_ALPHABETA_HEADER = true;

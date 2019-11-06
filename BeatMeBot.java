@@ -2,6 +2,7 @@ package sc.player2020.logic;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import sc.framework.plugins.Player;
 import sc.player2020.Starter;
 import sc.plugin2020.DragMove;
@@ -81,12 +82,9 @@ public class BeatMeBot implements IGameHandler {
     	startAlphaBeta();
     }
     
-    Lib.printLongBoard(gameState.getBoard(), Consts.PRINT_BOARD);
-    Lib.pln("  BestMove: " + bestMove.toString(), Consts.PRINT_MOVE);
 	sendAction(bestMove);
-	
-	final long timeEnd = System.currentTimeMillis();
-	Lib.pln("  Lauftzeit: " + (timeEnd - timeStart) + "ms.", Consts.PRINT_TIME);
+
+	printSummary(timeStart);
 	
   }
   
@@ -179,7 +177,11 @@ public class BeatMeBot implements IGameHandler {
 
 		// Show Board
 		if (Consts.PRINT_APLHABETA_SHOWBOARD) {
-			Lib.printBoard(this.gameState.getBoard());
+			List<String> boardList = Lib.printBoard(this.gameState.getBoard());
+			for (String s : boardList) {
+				outPut.add(s);
+			}
+			//Lib.printBoard(this.gameState.getBoard());
 		}
 
 		PlayerColor current;
@@ -203,11 +205,11 @@ public class BeatMeBot implements IGameHandler {
 				if ((x >= -5) && (x <= 5) && (y >= -5) && (y <= 5)) {
 					Field field = this.gameState.getBoard().getField(x, y, z);
 					// Eigene Insekten
-					if (field.getOwner().toString() == current.toString()) {
+					/*if (field.getOwner().toString() == current.toString()) {
 						if (field.getPieces().get(0).getType() == PieceType.ANT) {
 							value++;
 						}
-					}
+					}*/
 					// Gegnerische Mückenplage
 					
 				} // possible Field
@@ -221,6 +223,25 @@ public class BeatMeBot implements IGameHandler {
 		// TODO Es muss noch abgefragt werden, ob ein Spieler gewonnen hat (max.
 		// Schwarmgroesse)
 		return (this.gameState.getRound() == Constants.ROUND_LIMIT);
+	}
+	
+
+	private void printSummary(long timeStart) {
+		// Zugzusammenfassung ausgeben
+		if (Consts.PRINT_FOOTER) {
+			final long timeEnd = System.currentTimeMillis();
+			outPut.add("");
+			outPut.add("******************************");
+			outPut.add("");
+			outPut.add("Best Move: " + bestMove.toString());
+			outPut.add("Lauftzeit: " + (timeEnd - timeStart) + "ms. Suchtiefe " + Consts.ALPHABETA_DEPTH + " Aufrufe " + aufrufe);
+		}
+		// GESAMTAUSGABE
+		if (Consts.PRINT_ALPHABETA) {
+			for (String s : outPut) {
+				System.out.println(s);
+			}
+		}
 	}
 
   /**
