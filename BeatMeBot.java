@@ -205,11 +205,11 @@ public class BeatMeBot implements IGameHandler {
 				if ((x >= -5) && (x <= 5) && (y >= -5) && (y <= 5)) {
 					Field field = this.gameState.getBoard().getField(x, y, z);
 					// Eigene Insekten
-					/*if (field.getOwner().toString() == current.toString()) {
+					if (field.getFieldState().toString() == current.toString()) {
 						if (field.getPieces().get(0).getType() == PieceType.ANT) {
 							value++;
 						}
-					}*/
+					}
 					// Gegnerische Mückenplage
 					
 				} // possible Field
