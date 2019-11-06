@@ -38,7 +38,8 @@ public class BeatMeBot implements IGameHandler {
   
   private int aufrufe;
   private Move bestMove;
-  private String[] moveList = new String[Consts.ALPHABETA_DEPTH];
+  private String[] alphaBetaMoveList = new String[Consts.ALPHABETA_DEPTH];
+  private List<String> outPut = new ArrayList<String>();
 
   /**
    * Erzeugt ein neues Strategieobjekt, das zufaellige Zuege taetigt.
@@ -64,16 +65,12 @@ public class BeatMeBot implements IGameHandler {
     
     final long timeStart = System.currentTimeMillis();
     
+    outPut.clear();
     int turn = gameState.getTurn();
 
-    Lib.pln("", Consts.PRINT_NEW_ROUND);
-    Lib.pln("* * * * * * * * * * * *", Consts.PRINT_NEW_ROUND);
-    Lib.pln("* N e u e   R u n d e *", Consts.PRINT_NEW_ROUND);
-    Lib.pln("* * * * * * * * * * * *", Consts.PRINT_NEW_ROUND);
-    Lib.pln("", Consts.PRINT_NEW_ROUND);
-    Lib.pln("  Turn: " + turn, Consts.PRINT_ROUND_INFO);
+    Lib.printHeader(turn, Consts.PRINT_HEADER);
     
-    // TURN 0 and 1
+    // TURN 0 and 1 to set the BEE in your 1st turn
     if (turn < 2) {
     	CubeCoordinates beeMove = Lib.findMove(gameState, turn);
     	Piece bee = new Piece(gameState.getCurrentPlayerColor(), PieceType.BEE);
@@ -81,17 +78,11 @@ public class BeatMeBot implements IGameHandler {
     	
     // ALPHA BETA
     } else {
-    	
     	startAlphaBeta();
-	    
     }
     
-    // Board ausgeben
-    if (Consts.PRINT_BOARD) {
-    	Lib.printBoard(gameState.getBoard());
-    }
-    
-    Lib.pln("  BestMove: ", Consts.PRINT_MOVE);
+    Lib.printLongBoard(gameState.getBoard(), Consts.PRINT_BOARD);
+    Lib.pln("  BestMove: " + bestMove.toString(), Consts.PRINT_MOVE);
 	sendAction(bestMove);
 	
 	final long timeEnd = System.currentTimeMillis();
@@ -100,8 +91,8 @@ public class BeatMeBot implements IGameHandler {
   }
   
 	private void startAlphaBeta() {
+		outPut.add("  Start AlphaBeta_");
 		aufrufe = 0;
-
 		boolean error = false;
 
 		try {
@@ -119,7 +110,7 @@ public class BeatMeBot implements IGameHandler {
 			if (bestMove.equals(null) == true) {
 				List<Move> possibleMoves = GameRuleLogic.getPossibleMoves(gameState);
 				bestMove = possibleMoves.get((int) (Math.random() * possibleMoves.size()));
-				Lib.pln("RND MOVE: " + bestMove.toString(), Consts.PRINT_ALPHABETA);
+				outPut.add("  KRRR - AlphaBetaError! rnd Move: " + bestMove.toString());
 			}
 		}
 	}
@@ -129,15 +120,15 @@ public class BeatMeBot implements IGameHandler {
 		// Abbruchkriterium
 		if ((tiefe == 0) || endOfGame()) {
 			int value = rateAlphaBeta();
-			if (Consts.SHOW_HEADER) {
-				Lib.pln("", true);
-				Lib.pln("***N*E*W***M*O*V*E***", true);
-				Lib.pln("Value: " + value + " - Tiefe: " + Consts.ALPHABETA_DEPTH + " - Aufrufe: " + aufrufe + " - Turn: "
-						+ gameState.getTurn() + " - Round: " + gameState.getRound(), true);
+			if (Consts.PRINT_ALPHABETA_HEADER) {
+				outPut.add("");
+				outPut.add("***N*E*W***M*O*V*E***");
+				outPut.add("Value: " + value + " - Tiefe: " + Consts.ALPHABETA_DEPTH + " - Aufrufe: " + aufrufe + " - Turn: "
+						+ gameState.getTurn() + " - Round: " + gameState.getRound());
 			}
-			if (Consts.SHOW_MOVES) {
-				for (String moveStr : moveList) {
-					Lib.pln(moveStr, true);
+			if (Consts.PRINT_ALPHABETA_SHOWMOVES) {
+				for (String moveStr : alphaBetaMoveList) {
+					outPut.add(moveStr);
 				}
 			}
 			return value;
@@ -147,7 +138,7 @@ public class BeatMeBot implements IGameHandler {
 		List<Move> moves = GameRuleLogic.getPossibleMoves(gameState);
 
 		for (Move move : moves) {
-			moveList[Consts.ALPHABETA_DEPTH - tiefe] = move.toString(); //+ " "
+			alphaBetaMoveList[Consts.ALPHABETA_DEPTH - tiefe] = move.toString(); //+ " "
 					//+ this.gameState.getBoard().getField(move.x, move.y).getState().toString();
 			GameState g = this.gameState.clone();
 			GameRuleLogic.performMove(this.gameState, move);
@@ -172,7 +163,7 @@ public class BeatMeBot implements IGameHandler {
 						DragMove dragMove = (DragMove) move;
 						bestMove = new DragMove(dragMove.getStart(), move.getDestination());
 					}
-					Lib.pln("NEW BEST MOVE: " + bestMove.toString() + " Value: " + best, Consts.PRINT_ALPHABETA);
+					outPut.add("NEW BEST MOVE: " + bestMove.toString() + " Value: " + best);
 				}
 				if (wert > alpha) {
 					alpha = wert;
@@ -187,7 +178,7 @@ public class BeatMeBot implements IGameHandler {
 		int value = 0;
 
 		// Show Board
-		if (Consts.SHOW_BOARD) {
+		if (Consts.PRINT_APLHABETA_SHOWBOARD) {
 			Lib.printBoard(this.gameState.getBoard());
 		}
 

@@ -23,6 +23,15 @@ public class Lib {
 		}
 	}
 	
+	public static void printHeader(int turn, boolean print) {
+	    pln("", print);
+	    pln("* * * * * * * * * * * *", print);
+	    pln("* N e u e   R u n d e *", print);
+	    pln("* * * * * * * * * * * *", print);
+	    pln("", print);
+	    pln("  Turn: " + turn, print);
+	}
+	
 	private static int getDistance(CubeCoordinates p1, CubeCoordinates p2) {
 		int distance = 0;
 		// P1 lieft weiter "oben"
@@ -136,7 +145,10 @@ public class Lib {
         } 		
 	}
 	
-	public static void printBoard(Board board) {
+	public static void printLongBoard(Board board, boolean print) {
+		if (!print) {
+			return;
+		}
 		// Alle Zeilen durchlaufen...
 		for (int row = 0; row < 11; row++) {
 			String strRow1 = "";
@@ -169,6 +181,40 @@ public class Lib {
 			} // of for row
 			System.out.println(strRow1);
 			System.out.println(strRow2);
+		} // of for col
+	}
+	
+	public static void printBoard(Board board) {
+		// Alle Zeilen durchlaufen...
+		for (int row = 0; row < 11; row++) {
+			String strRow = "";
+			// Alle Spalten durchrattern...
+			for (int col = 0; col < 11; col++) {
+				// x, y, z berechnen
+				int x = (int) (col - 2 - Math.round((row + 1) / 2)); 
+				int z = row - 5;
+				int y = -1 * (x + z);
+				// Nur zweichnen, wenn Field im Hexagon liegt
+				if ((x >= -5) && (x <= 5) && (y >= -5) && (y <= 5)) {
+					String type = "";
+					Field field = board.getField(x, y, z);
+					switch(field.getFieldState().toString().substring(0, 1)) {
+						case "B": type = "B";
+						case "R": type = "R";
+						case "O": type = "*";
+						case "E": type = "_";
+					}
+
+					if (row %2 == 0) { // gerade Zeile
+						strRow += " " + type; 
+					} else { // ungerade
+						strRow += type + " ";
+					}
+				} else { // Auﬂen-/Randfelder
+					strRow += "  "; 				
+				}
+			} // of for row
+			System.out.println(strRow);
 		} // of for col
 	}
 }
