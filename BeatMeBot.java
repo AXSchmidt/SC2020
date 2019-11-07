@@ -31,8 +31,7 @@ import java.util.List;
  * Ausserdem werden zum Spielverlauf Konsolenausgaben gemacht.
  */
 public class BeatMeBot implements IGameHandler {
-  private static final Logger log = LoggerFactory.getLogger(BeatMeBot.class);
-
+  
   private Starter client;
   private GameState gameState;
   private Player currentPlayer;
@@ -174,16 +173,10 @@ public class BeatMeBot implements IGameHandler {
 	}
 
 	private int rateAlphaBeta() {
-
 		printAlphaBetaBoard();
 
 		int value = 0;
-		PlayerColor current;
-		if (Consts.ALPHABETA_DEPTH % 2 == 0) {
-			current = this.gameState.getCurrentPlayer().getColor();
-		} else {
-			current = this.gameState.getOtherPlayer().getColor();
-		}
+		PlayerColor current = this.gameState.getCurrentPlayer().getColor();
 		PlayerColor opponent = current.opponent();
 
 		List<Field> fieldList = Lib.getAllFields(this.gameState.getBoard());
@@ -243,7 +236,6 @@ public class BeatMeBot implements IGameHandler {
   @Override
   public void onUpdate(Player player, Player otherPlayer) {
     currentPlayer = player;
-    // log.info("Spielerwechsel: " + player.getColor());
   }
 
   /**
@@ -253,7 +245,6 @@ public class BeatMeBot implements IGameHandler {
   public void onUpdate(GameState gameState) {
     this.gameState = gameState;
     currentPlayer = gameState.getCurrentPlayer();
-    // log.info("Zug: {} Spieler: {}", gameState.getTurn(), currentPlayer.getColor());
   }
 
   /**
