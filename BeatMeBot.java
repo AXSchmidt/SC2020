@@ -197,10 +197,12 @@ public class BeatMeBot implements IGameHandler {
 						}
 					}
 				}
+				// Eigener Mistkaefer auf gegnerischer Koenigin is geil!
 			}
 			// Gegnerische Mückenplage	
 			if (field.getFieldState().toString() == opponent.toString()) {
 				// Gegnerische Queen anbaggern is ok
+				// TODO: Was wenn Queen nicht oben is
 				if (field.getPieces().get(0).getType() == PieceType.BEE) {
 					List<Field> beeList = Lib.getAdjacentFields(this.gameState.getBoard(), field);
 					for (Field beeGuard : beeList) {
