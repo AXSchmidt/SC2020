@@ -148,6 +148,12 @@ public class Lib {
         } 		
 	}
 	
+	public static boolean isCoordinatesOnBoard(CubeCoordinates coordinates) {
+		int x = coordinates.getX();
+		int y = coordinates.getY();
+		return ((x >= -5) && (x <= 5) && (y >= -5) && (y <= 5));
+	}
+	
 	public static List<Field> getAllFields(Board board) {
 		List<Field> outPut = new ArrayList<Field>();
 		for (int row = 0; row < 11; row++) { // Alle Zeilen durchlaufen
@@ -163,6 +169,40 @@ public class Lib {
 		} // of for col
 		return outPut;
 		
+	}
+	
+	public static List<Field> getAdjacentFields(Board board, Field field) {
+		List<Field> outPut = new ArrayList<Field>();
+		CubeCoordinates coordinates = field.getCoordinates();
+		int x = coordinates.getX();
+		int y = coordinates.getY();
+		int z = coordinates.getZ();
+		
+		CubeCoordinates topleft = new CubeCoordinates(x, y+1, z-1);
+		if (isCoordinatesOnBoard(topleft)) {
+			outPut.add(board.getField(topleft));
+		}
+		CubeCoordinates topright = new CubeCoordinates(x+1, y, z-1);
+		if (isCoordinatesOnBoard(topleft)) {
+			outPut.add(board.getField(topleft));
+		}
+		CubeCoordinates right = new CubeCoordinates(x+1, y-1, z);
+		if (isCoordinatesOnBoard(topleft)) {
+			outPut.add(board.getField(topleft));
+		}
+		CubeCoordinates bottomright = new CubeCoordinates(x, y-1, z+1);
+		if (isCoordinatesOnBoard(topleft)) {
+			outPut.add(board.getField(topleft));
+		}
+		CubeCoordinates bottomleft = new CubeCoordinates(x-1, y, z+1);
+		if (isCoordinatesOnBoard(topleft)) {
+			outPut.add(board.getField(topleft));
+		}
+		CubeCoordinates left = new CubeCoordinates(x-1, y+1, z);
+		if (isCoordinatesOnBoard(topleft)) {
+			outPut.add(board.getField(topleft));
+		}
+		return outPut;
 	}
 	
 	public static void printLongBoard(Board board, boolean print) {

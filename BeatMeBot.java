@@ -9,6 +9,7 @@ import sc.plugin2020.DragMove;
 import sc.plugin2020.GameState;
 import sc.plugin2020.IGameHandler;
 import sc.plugin2020.Field;
+import sc.plugin2020.FieldState;
 import sc.plugin2020.Move;
 import sc.plugin2020.SetMove;
 import sc.plugin2020.Piece;
@@ -183,14 +184,30 @@ public class BeatMeBot implements IGameHandler {
 		for (Field field : fieldList) {
 			// Eigene Insekten
 			if (field.getFieldState().toString() == current.toString()) {
+				// Ameisenplage ist immer gut
 				if (field.getPieces().get(0).getType() == PieceType.ANT) {
 					value++;
+				}
+				// Bitte eigene Bienenkoenigin nicht surrounden
+				if (field.getPieces().get(0).getType() == PieceType.BEE) {
+					List<Field> beeList = Lib.getAdjacentFields(this.gameState.getBoard(), field);
+					for (Field beeGuard : beeList) {
+						if (beeGuard.getFieldState() != FieldState.EMPTY) {
+							value--;
+						}
+					}
 				}
 			}
 			// Gegnerische Mückenplage	
 			if (field.getFieldState().toString() == opponent.toString()) {
-				if (field.getPieces().get(0).getType() == PieceType.ANT) {
-					value = value - 2;
+				// Gegnerische Queen anbaggern is ok
+				if (field.getPieces().get(0).getType() == PieceType.BEE) {
+					List<Field> beeList = Lib.getAdjacentFields(this.gameState.getBoard(), field);
+					for (Field beeGuard : beeList) {
+						if (beeGuard.getFieldState() != FieldState.EMPTY) {
+							value += 2;
+						}
+					}
 				}
 			}
 		}

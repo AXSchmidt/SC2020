@@ -1,7 +1,7 @@
 package sc.player2020.logic;
 
 public class Consts {
-	public static int ALPHABETA_DEPTH = 1;	
+	public static int ALPHABETA_DEPTH = 3;	
 	
 	// PRINT Constants
 	public static boolean PRINT_ERROR = true;
