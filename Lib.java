@@ -148,6 +148,23 @@ public class Lib {
         } 		
 	}
 	
+	public static List<Field> getAllFields(Board board) {
+		List<Field> outPut = new ArrayList<Field>();
+		for (int row = 0; row < 11; row++) { // Alle Zeilen durchlaufen
+			for (int col = 0; col < 11; col++) { // Spalten durchrattern
+				int x = (int) (col - 2 - Math.round((row + 1) / 2)); 
+				int z = row - 5;
+				int y = -1 * (x + z);
+				// Nur suchen, wenn Field auf Feld liegt
+				if ((x >= -5) && (x <= 5) && (y >= -5) && (y <= 5)) {
+					outPut.add(board.getField(x, y, z));
+				} // possible Field
+			} // of for row
+		} // of for col
+		return outPut;
+		
+	}
+	
 	public static void printLongBoard(Board board, boolean print) {
 		if (!print) {
 			return;

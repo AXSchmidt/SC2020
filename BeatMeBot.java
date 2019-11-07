@@ -134,6 +134,7 @@ public class BeatMeBot implements IGameHandler {
 		boolean PVgefunden = false;
 		int best = Integer.MIN_VALUE + 1;
 		List<Move> moves = GameRuleLogic.getPossibleMoves(gameState);
+		// TODO Abbruchkriterium wenn Liste = leer? => SkipMove
 
 		for (Move move : moves) {
 			alphaBetaMoveList[Consts.ALPHABETA_DEPTH - tiefe] = move.toString(); //+ " "
@@ -173,56 +174,49 @@ public class BeatMeBot implements IGameHandler {
 	}
 
 	private int rateAlphaBeta() {
+
+		printAlphaBetaBoard();
+
 		int value = 0;
-
-		// Show Board
-		if (Consts.PRINT_APLHABETA_SHOWBOARD) {
-			List<String> boardList = Lib.printBoard(this.gameState.getBoard());
-			for (String s : boardList) {
-				outPut.add(s);
-			}
-			//Lib.printBoard(this.gameState.getBoard());
-		}
-
 		PlayerColor current;
-		PlayerColor opponent;
 		if (Consts.ALPHABETA_DEPTH % 2 == 0) {
 			current = this.gameState.getCurrentPlayer().getColor();
 		} else {
 			current = this.gameState.getOtherPlayer().getColor();
 		}
-		opponent = current.opponent();
+		PlayerColor opponent = current.opponent();
 
-		// Alle Zeilen durchlaufen...
-		for (int row = 0; row < 11; row++) {
-			// Alle Spalten durchrattern...
-			for (int col = 0; col < 11; col++) {
-				// x, y, z berechnen
-				int x = (int) (col - 2 - Math.round((row + 1) / 2)); 
-				int z = row - 5;
-				int y = -1 * (x + z);
-				// Nur suchen, wenn Field auf Feld liegt
-				if ((x >= -5) && (x <= 5) && (y >= -5) && (y <= 5)) {
-					Field field = this.gameState.getBoard().getField(x, y, z);
-					// Eigene Insekten
-					if (field.getFieldState().toString() == current.toString()) {
-						if (field.getPieces().get(0).getType() == PieceType.ANT) {
-							value++;
-						}
-					}
-					// Gegnerische Mückenplage
-					
-				} // possible Field
-			} // of for row
-		} // of for col
-
+		List<Field> fieldList = Lib.getAllFields(this.gameState.getBoard());
+		for (Field field : fieldList) {
+			// Eigene Insekten
+			if (field.getFieldState().toString() == current.toString()) {
+				if (field.getPieces().get(0).getType() == PieceType.ANT) {
+					value++;
+				}
+			}
+			// Gegnerische Mückenplage	
+			if (field.getFieldState().toString() == opponent.toString()) {
+				if (field.getPieces().get(0).getType() == PieceType.ANT) {
+					value = value - 2;
+				}
+			}
+		}
 		return value;
 	}
 
 	private boolean endOfGame() {
-		// TODO Es muss noch abgefragt werden, ob ein Spieler gewonnen hat (max.
-		// Schwarmgroesse)
+		// TODO Es muss noch abgefragt werden, ob ein Spieler gewonnen hat.
+		// (Bienenkoenigin umzingelt)
 		return (this.gameState.getRound() == Constants.ROUND_LIMIT);
+	}
+	
+	private void printAlphaBetaBoard() {
+		if (Consts.PRINT_APLHABETA_SHOWBOARD) {
+			List<String> boardList = Lib.printBoard(this.gameState.getBoard());
+			for (String s : boardList) {
+				outPut.add(s);
+			}
+		}
 	}
 	
 
