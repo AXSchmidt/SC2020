@@ -193,7 +193,7 @@ public class BeatMeBot implements IGameHandler {
 					List<Field> beeList = Lib.getAdjacentFields(this.gameState.getBoard(), field);
 					for (Field beeGuard : beeList) {
 						if (beeGuard.getFieldState() != FieldState.EMPTY) {
-							value--;
+							//value--;
 						}
 					}
 				}
@@ -207,7 +207,8 @@ public class BeatMeBot implements IGameHandler {
 					List<Field> beeList = Lib.getAdjacentFields(this.gameState.getBoard(), field);
 					for (Field beeGuard : beeList) {
 						if (beeGuard.getFieldState() != FieldState.EMPTY) {
-							value += 2;
+							System.out.println("BEEGUARD: " + beeGuard.toString());
+							value += 5;
 						}
 					}
 				}

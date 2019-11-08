@@ -183,24 +183,24 @@ public class Lib {
 			outPut.add(board.getField(topleft));
 		}
 		CubeCoordinates topright = new CubeCoordinates(x+1, y, z-1);
-		if (isCoordinatesOnBoard(topleft)) {
-			outPut.add(board.getField(topleft));
+		if (isCoordinatesOnBoard(topright)) {
+			outPut.add(board.getField(topright));
 		}
 		CubeCoordinates right = new CubeCoordinates(x+1, y-1, z);
-		if (isCoordinatesOnBoard(topleft)) {
-			outPut.add(board.getField(topleft));
+		if (isCoordinatesOnBoard(right)) {
+			outPut.add(board.getField(right));
 		}
 		CubeCoordinates bottomright = new CubeCoordinates(x, y-1, z+1);
-		if (isCoordinatesOnBoard(topleft)) {
-			outPut.add(board.getField(topleft));
+		if (isCoordinatesOnBoard(bottomright)) {
+			outPut.add(board.getField(bottomright));
 		}
 		CubeCoordinates bottomleft = new CubeCoordinates(x-1, y, z+1);
-		if (isCoordinatesOnBoard(topleft)) {
-			outPut.add(board.getField(topleft));
+		if (isCoordinatesOnBoard(bottomleft)) {
+			outPut.add(board.getField(bottomleft));
 		}
 		CubeCoordinates left = new CubeCoordinates(x-1, y+1, z);
-		if (isCoordinatesOnBoard(topleft)) {
-			outPut.add(board.getField(topleft));
+		if (isCoordinatesOnBoard(left)) {
+			outPut.add(board.getField(left));
 		}
 		return outPut;
 	}
@@ -221,7 +221,7 @@ public class Lib {
 				int y = -1 * (x + z);
 				// Nur zweichnen, wenn Field im Hexagon liegt
 				if ((x >= -5) && (x <= 5) && (y >= -5) && (y <= 5)) {
-					String type = " " + board.getField(x, y, z).getFieldState().toString().substring(0, 1);
+					//String type = " " + board.getField(x, y, z).getFieldState().toString().substring(0, 1);
 					
 					CubeCoordinates field = new CubeCoordinates(x, y, z);
 					String distance = " " + Math.min(distanceToBorder(field),
@@ -260,11 +260,20 @@ public class Lib {
 					String type = "";
 					Field field = board.getField(x, y, z);
 					switch(field.getFieldState().toString().substring(0, 1)) {
-						case "B": type = "B";
-						case "R": type = "R";
-						case "O": type = "*";
-						case "E": type = "_";
+						case "B":
+							type = getPieceType(field).toLowerCase();
+							break;
+						case "R": 
+							type = getPieceType(field);
+							break;
+						case "O":
+							type = "*";
+							break;
+						case "E":
+							type = "_";
+							break;
 					}
+					//type = field.getFieldState().toString().substring(0, 1);
 
 					if (row %2 == 0) { // gerade Zeile
 						strRow += " " + type; 
@@ -278,5 +287,13 @@ public class Lib {
 			outPut.add(strRow);
 		} // of for col
 		return outPut;
+	}
+	
+	private static String getPieceType(Field field) {
+		if (field.getPieces().get(0).getType() == PieceType.BEE) {
+			return "Q"; // BEE != "B" wegen BEETLE
+		} else {
+			return field.getPieces().get(0).getType().toString().substring(0, 1);
+		}
 	}
 }
