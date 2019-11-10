@@ -171,7 +171,7 @@ public class Lib {
 		
 	}
 	
-	public static List<Field> getAdjacentFields(Board board, Field field) {
+	public static List<Field> getNeighbours(Board board, Field field) {
 		List<Field> outPut = new ArrayList<Field>();
 		CubeCoordinates coordinates = field.getCoordinates();
 		int x = coordinates.getX();
@@ -290,10 +290,25 @@ public class Lib {
 	}
 	
 	private static String getPieceType(Field field) {
-		if (field.getPieces().get(0).getType() == PieceType.BEE) {
+		List<Piece> pieces = field.getPieces();
+		/* Auf dem field können mehrere pieces liegen.
+		 * .get(0) ist immer der unterste
+		 * .get(size-1) ist immer der oberste
+		 */
+		if (field.getPieces().get(pieces.size()-1).getType() == PieceType.BEE) {
 			return "Q"; // BEE != "B" wegen BEETLE
 		} else {
-			return field.getPieces().get(0).getType().toString().substring(0, 1);
+			return field.getPieces().get(pieces.size()-1).getType().toString().substring(0, 1);
 		}
+	}
+	
+	public static boolean fieldContainsPiece(Field field, PieceType pieceType) {
+		List<Piece> pieces = field.getPieces();
+		for (Piece piece: pieces) {
+			if (piece.getType() == pieceType) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

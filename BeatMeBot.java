@@ -12,6 +12,7 @@ import sc.plugin2020.Field;
 import sc.plugin2020.FieldState;
 import sc.plugin2020.Move;
 import sc.plugin2020.SetMove;
+import sc.plugin2020.SkipMove;
 import sc.plugin2020.Piece;
 import sc.plugin2020.PieceType;
 import sc.plugin2020.util.CubeCoordinates;
@@ -39,6 +40,7 @@ public class BeatMeBot implements IGameHandler {
   
   private int aufrufe;
   private Move bestMove;
+  private List<String> bestMoveRating = new ArrayList<String>();
   private String[] alphaBetaMoveList = new String[Consts.ALPHABETA_DEPTH];
   private List<String> outPut = new ArrayList<String>();
 
@@ -134,6 +136,9 @@ public class BeatMeBot implements IGameHandler {
 		int best = Integer.MIN_VALUE + 1;
 		List<Move> moves = GameRuleLogic.getPossibleMoves(gameState);
 		// TODO Abbruchkriterium wenn Liste = leer? => SkipMove
+		if (moves.size() == 0) {
+			//bestMove = new SkipMove(); // Constructor is private?
+		}
 
 		for (Move move : moves) {
 			alphaBetaMoveList[Consts.ALPHABETA_DEPTH - tiefe] = move.toString(); //+ " "
@@ -181,38 +186,45 @@ public class BeatMeBot implements IGameHandler {
 
 		List<Field> fieldList = Lib.getAllFields(this.gameState.getBoard());
 		for (Field field : fieldList) {
+			
 			// Eigene Insekten
 			if (field.getFieldState().toString() == current.toString()) {
 				// Ameisenplage ist immer gut
 				if (field.getPieces().get(0).getType() == PieceType.ANT) {
-					value++;
+					value += 2;
 				}
 				// Bitte eigene Bienenkoenigin nicht surrounden
 				if (field.getPieces().get(0).getType() == PieceType.BEE) {
-					List<Field> beeList = Lib.getAdjacentFields(this.gameState.getBoard(), field);
+					int beeNeighbors = 0;
+					List<Field> beeList = Lib.getNeighbours(this.gameState.getBoard(), field);
 					for (Field beeGuard : beeList) {
 						if (beeGuard.getFieldState() != FieldState.EMPTY) {
-							//value--;
+							beeNeighbors++;
 						}
 					}
+					value -= Math.pow(2, beeNeighbors);
 				}
+				
 				// Eigener Mistkaefer auf gegnerischer Koenigin is geil!
 			}
+			
 			// Gegnerische Mückenplage	
 			if (field.getFieldState().toString() == opponent.toString()) {
 				// Gegnerische Queen anbaggern is ok
 				// TODO: Was wenn Queen nicht oben is
 				if (field.getPieces().get(0).getType() == PieceType.BEE) {
-					List<Field> beeList = Lib.getAdjacentFields(this.gameState.getBoard(), field);
+					int beeNeighbors = 0;
+					List<Field> beeList = Lib.getNeighbours(this.gameState.getBoard(), field);
 					for (Field beeGuard : beeList) {
 						if (beeGuard.getFieldState() != FieldState.EMPTY) {
 							System.out.println("BEEGUARD: " + beeGuard.toString());
-							value += 5;
+							beeNeighbors++;
 						}
 					}
+					value += Math.pow(2, beeNeighbors + 1);
 				}
 			}
-		}
+		} // end of fieldList
 		return value;
 	}
 
@@ -245,6 +257,8 @@ public class BeatMeBot implements IGameHandler {
 			Lib.pln("", true);
 			Lib.pln("***S*U*M*M*A*R*Y***", true);
 			Lib.pln("  Best Move: " + bestMove.toString(), true);
+			Lib.pln("  Punkte Rot: " + this.gameState.getPointsForPlayer(PlayerColor.RED), true);
+			Lib.pln("  Punkte Blau: " + this.gameState.getPointsForPlayer(PlayerColor.BLUE	), true);
 			Lib.pln("  Lauftzeit: " + (timeEnd - timeStart) + "ms. Suchtiefe " + Consts.ALPHABETA_DEPTH + " Aufrufe " + aufrufe, true);
 		}
 	}
