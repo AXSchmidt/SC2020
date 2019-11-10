@@ -65,19 +65,12 @@ public class BeatMeBot implements IGameHandler {
   public void onRequestAction() {
     
     final long timeStart = System.currentTimeMillis();
-    
     outPut.clear();
-    int turn = gameState.getTurn();
 
-    Lib.printHeader(turn, Consts.PRINT_HEADER);
-    
-    // TURN 0 and 1 to set the BEE in your 1st turn
-    if (turn < 2) {
-    	CubeCoordinates beeMove = Lib.findMove(gameState, turn);
-    	Piece bee = new Piece(gameState.getCurrentPlayerColor(), PieceType.BEE);
-    	bestMove = new SetMove(bee, beeMove);
-    	
-    // ALPHA BETA
+    Lib.printHeader(gameState.getTurn(), Consts.PRINT_HEADER);
+
+    if (gameState.getTurn() < 2) {
+    	setBee(gameState.getTurn());
     } else {
     	startAlphaBeta();
     }
@@ -86,6 +79,12 @@ public class BeatMeBot implements IGameHandler {
 
 	printSummary(timeStart);
 	
+  }
+  
+  private void setBee(int turn) {
+  	CubeCoordinates beeMove = Lib.findMove(gameState, turn);
+  	Piece bee = new Piece(gameState.getCurrentPlayerColor(), PieceType.BEE);
+  	bestMove = new SetMove(bee, beeMove);	  
   }
   
 	private void startAlphaBeta() {
