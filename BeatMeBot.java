@@ -194,7 +194,7 @@ public class BeatMeBot implements IGameHandler {
 					value += 2;
 				}
 				// Bitte eigene Bienenkoenigin nicht surrounden
-				if (field.getPieces().get(0).getType() == PieceType.BEE) {
+				if (Lib.fieldContainsPiece(field, PieceType.BEE)) {
 					int beeNeighbors = 0;
 					List<Field> beeList = Lib.getNeighbours(this.gameState.getBoard(), field);
 					for (Field beeGuard : beeList) {
@@ -210,9 +210,7 @@ public class BeatMeBot implements IGameHandler {
 			
 			// Gegnerische Mückenplage	
 			if (field.getFieldState().toString() == opponent.toString()) {
-				// Gegnerische Queen anbaggern is ok
-				// TODO: Was wenn Queen nicht oben is
-				if (field.getPieces().get(0).getType() == PieceType.BEE) {
+				if (Lib.fieldContainsPiece(field, PieceType.BEE)) {
 					int beeNeighbors = 0;
 					List<Field> beeList = Lib.getNeighbours(this.gameState.getBoard(), field);
 					for (Field beeGuard : beeList) {
