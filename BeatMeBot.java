@@ -40,6 +40,7 @@ public class BeatMeBot implements IGameHandler {
   
   private int aufrufe;
   private Move bestMove;
+  private String bestValue;
   private List<String> bestMoveRating = new ArrayList<String>();
   private String[] alphaBetaMoveList = new String[Consts.ALPHABETA_DEPTH];
   private List<String> outPut = new ArrayList<String>();
@@ -135,39 +136,42 @@ public class BeatMeBot implements IGameHandler {
 		boolean PVgefunden = false;
 		int best = Integer.MIN_VALUE + 1;
 		List<Move> moves = GameRuleLogic.getPossibleMoves(gameState);
-		// TODO Abbruchkriterium wenn Liste = leer? => SkipMove
 		if (moves.size() == 0) {
-			//bestMove = new SkipMove(); // Constructor is private?
+			//bestMove = new SkipMove(); // TODO Constructor is private?
 		}
 
 		for (Move move : moves) {
-			alphaBetaMoveList[Consts.ALPHABETA_DEPTH - tiefe] = move.toString(); //+ " "
-					//+ this.gameState.getBoard().getField(move.x, move.y).getState().toString();
+			alphaBetaMoveList[Consts.ALPHABETA_DEPTH - tiefe] = move.toString();
 			GameState g = this.gameState.clone();
 			GameRuleLogic.performMove(this.gameState, move);
 			int wert;
 			if (PVgefunden) {
 				wert = -alphaBeta(-alpha - 1, -alpha, tiefe - 1);
-				if (wert > alpha && wert < beta)
+				if ((wert > alpha) && (wert < beta)) {
 					wert = -alphaBeta(-beta, -wert, tiefe - 1);
+				}
 			} else
 				wert = -alphaBeta(-beta, -alpha, tiefe - 1);
-			this.gameState = g;
+			this.gameState = g; // ?
 			if (wert > best) {
-				if (wert >= beta)
-					return wert;
-				best = wert;
 				if (tiefe == Consts.ALPHABETA_DEPTH) {
 					// ZUG KOPIEREN? GEHT DAS SO?
 					if (move.toString().substring(0, 1).equals("S")) { // SetMove
 						SetMove setMove = (SetMove) move;
 						bestMove = new SetMove(setMove.getPiece(), move.getDestination());
+						bestValue = String.valueOf(wert);
 					} else {
 						DragMove dragMove = (DragMove) move;
 						bestMove = new DragMove(dragMove.getStart(), move.getDestination());
+						bestValue = String.valueOf(wert);
 					}
 					outPut.add("NEW BEST MOVE: " + bestMove.toString() + " Value: " + best);
 				}
+				if (wert >= beta) {
+					return wert;
+				}
+				best = wert;
+
 				if (wert > alpha) {
 					alpha = wert;
 					PVgefunden = true;
@@ -182,7 +186,11 @@ public class BeatMeBot implements IGameHandler {
 
 		int value = 0;
 		PlayerColor current = this.gameState.getCurrentPlayer().getColor();
+		if (Consts.ALPHABETA_DEPTH % 2 != 0) {
+			current = this.gameState.getCurrentPlayer().getColor().opponent();
+		}
 		PlayerColor opponent = current.opponent();
+		outPut.add("You: "+current.toString());
 
 		List<Field> fieldList = Lib.getAllFields(this.gameState.getBoard());
 		for (Field field : fieldList) {
@@ -202,7 +210,9 @@ public class BeatMeBot implements IGameHandler {
 							beeNeighbors++;
 						}
 					}
-					value -= Math.pow(2, beeNeighbors);
+					if (beeNeighbors > 2) {
+						value -= Math.pow(2, beeNeighbors);
+					}
 				}
 				
 				// Eigener Mistkaefer auf gegnerischer Koenigin is geil!
@@ -219,10 +229,16 @@ public class BeatMeBot implements IGameHandler {
 							beeNeighbors++;
 						}
 					}
-					value += Math.pow(2, beeNeighbors + 1);
+					if (beeNeighbors > 2) {
+						value += Math.pow(2, beeNeighbors + 1);
+					}
 				}
 			}
 		} // end of fieldList
+		
+		if (Consts.ALPHABETA_DEPTH % 2 != 0) {
+			value = -value;
+		}
 		return value;
 	}
 
@@ -254,7 +270,7 @@ public class BeatMeBot implements IGameHandler {
 			final long timeEnd = System.currentTimeMillis();
 			Lib.pln("", true);
 			Lib.pln("***S*U*M*M*A*R*Y***", true);
-			Lib.pln("  Best Move: " + bestMove.toString(), true);
+			Lib.pln("  Best Move: " + bestMove.toString() + " - Value: " + bestValue, true);
 			Lib.pln("  Punkte Rot: " + this.gameState.getPointsForPlayer(PlayerColor.RED), true);
 			Lib.pln("  Punkte Blau: " + this.gameState.getPointsForPlayer(PlayerColor.BLUE	), true);
 			Lib.pln("  Lauftzeit: " + (timeEnd - timeStart) + "ms. Suchtiefe " + Consts.ALPHABETA_DEPTH + " Aufrufe " + aufrufe, true);
