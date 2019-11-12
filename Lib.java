@@ -143,7 +143,7 @@ public class Lib {
         case 1:
         	return findSecondMove(gameState);
         default:
-        	pln("DEBUG; wrong turn: " + turn, Consts.PRINT_ERROR);
+        	pln("DEBUG; wrong turn: " + turn, Helper.PRINT_ERROR);
             return null;
         } 		
 	}

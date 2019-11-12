@@ -1,6 +1,6 @@
 package sc.player2020.logic;
 
-public class Consts {
+public class Helper {
 	// GLOBAL Constants
 	public static int ALPHABETA_DEPTH = 3;	
 	

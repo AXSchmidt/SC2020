@@ -42,7 +42,7 @@ public class BeatMeBot implements IGameHandler {
   private Move bestMove;
   private String bestValue;
   private List<String> bestMoveRating = new ArrayList<String>();
-  private String[] alphaBetaMoveList = new String[Consts.ALPHABETA_DEPTH];
+  private String[] alphaBetaMoveList = new String[Helper.ALPHABETA_DEPTH];
   private List<String> outPut = new ArrayList<String>();
 
   /**
@@ -70,7 +70,7 @@ public class BeatMeBot implements IGameHandler {
     final long timeStart = System.currentTimeMillis();
     outPut.clear();
 
-    Lib.printHeader(gameState.getTurn(), Consts.PRINT_HEADER);
+    Lib.printHeader(gameState.getTurn(), Helper.PRINT_HEADER);
 
     if (gameState.getTurn() < 2) {
     	setBee(gameState.getTurn());
@@ -97,7 +97,7 @@ public class BeatMeBot implements IGameHandler {
 
 		try {
 			// Eigentlicher Aufruf der Alphabeta
-			alphaBeta(Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1, Consts.ALPHABETA_DEPTH);
+			alphaBeta(Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1, Helper.ALPHABETA_DEPTH);
 		} catch (InvalidGameStateException e) {
 			error = true;
 			e.printStackTrace();
@@ -120,13 +120,13 @@ public class BeatMeBot implements IGameHandler {
 		// Abbruchkriterium
 		if ((tiefe == 0) || endOfGame()) {
 			int value = rateAlphaBeta();
-			if (Consts.PRINT_ALPHABETA_HEADER) {
+			if (Helper.PRINT_ALPHABETA_HEADER) {
 				outPut.add("");
 				outPut.add("***N*E*W***M*O*V*E***");
-				outPut.add("Value: " + value + " - Tiefe: " + Consts.ALPHABETA_DEPTH + " - Aufrufe: " + aufrufe + " - Turn: "
+				outPut.add("Value: " + value + " - Tiefe: " + Helper.ALPHABETA_DEPTH + " - Aufrufe: " + aufrufe + " - Turn: "
 						+ gameState.getTurn() + " - Round: " + gameState.getRound());
 			}
-			if (Consts.PRINT_ALPHABETA_SHOWMOVES) {
+			if (Helper.PRINT_ALPHABETA_SHOWMOVES) {
 				for (String moveStr : alphaBetaMoveList) {
 					outPut.add(moveStr);
 				}
@@ -141,7 +141,7 @@ public class BeatMeBot implements IGameHandler {
 		}
 
 		for (Move move : moves) {
-			alphaBetaMoveList[Consts.ALPHABETA_DEPTH - tiefe] = move.toString();
+			alphaBetaMoveList[Helper.ALPHABETA_DEPTH - tiefe] = move.toString();
 			GameState g = this.gameState.clone();
 			GameRuleLogic.performMove(this.gameState, move);
 			int wert;
@@ -154,7 +154,7 @@ public class BeatMeBot implements IGameHandler {
 				wert = -alphaBeta(-beta, -alpha, tiefe - 1);
 			this.gameState = g; // ?
 			if (wert > best) {
-				if (tiefe == Consts.ALPHABETA_DEPTH) {
+				if (tiefe == Helper.ALPHABETA_DEPTH) {
 					// ZUG KOPIEREN? GEHT DAS SO?
 					if (move.toString().substring(0, 1).equals("S")) { // SetMove
 						SetMove setMove = (SetMove) move;
@@ -186,7 +186,7 @@ public class BeatMeBot implements IGameHandler {
 
 		int value = 0;
 		PlayerColor current = this.gameState.getCurrentPlayer().getColor();
-		if (Consts.ALPHABETA_DEPTH % 2 != 0) {
+		if (Helper.ALPHABETA_DEPTH % 2 != 0) {
 			current = this.gameState.getCurrentPlayer().getColor().opponent();
 		}
 		PlayerColor opponent = current.opponent();
@@ -236,7 +236,7 @@ public class BeatMeBot implements IGameHandler {
 			}
 		} // end of fieldList
 		
-		if (Consts.ALPHABETA_DEPTH % 2 != 0) {
+		if (Helper.ALPHABETA_DEPTH % 2 != 0) {
 			value = -value;
 		}
 		return value;
@@ -249,7 +249,7 @@ public class BeatMeBot implements IGameHandler {
 	}
 	
 	private void printAlphaBetaBoard() {
-		if (Consts.PRINT_APLHABETA_SHOWBOARD) {
+		if (Helper.PRINT_APLHABETA_SHOWBOARD) {
 			List<String> boardList = Lib.printBoard(this.gameState.getBoard());
 			for (String s : boardList) {
 				outPut.add(s);
@@ -260,20 +260,20 @@ public class BeatMeBot implements IGameHandler {
 
 	private void printSummary(long timeStart) {
 		// Gesamtausgabe der AlphaBeta Logic ausgeben
-		if (Consts.PRINT_ALPHABETA) {
+		if (Helper.PRINT_ALPHABETA) {
 			for (String s : outPut) {
 				System.out.println(s);
 			}
 		}
 		// Zugzusammenfassung ausgeben
-		if (Consts.PRINT_FOOTER) {
+		if (Helper.PRINT_FOOTER) {
 			final long timeEnd = System.currentTimeMillis();
 			Lib.pln("", true);
 			Lib.pln("***S*U*M*M*A*R*Y***", true);
 			Lib.pln("  Best Move: " + bestMove.toString() + " - Value: " + bestValue, true);
 			Lib.pln("  Punkte Rot: " + this.gameState.getPointsForPlayer(PlayerColor.RED), true);
 			Lib.pln("  Punkte Blau: " + this.gameState.getPointsForPlayer(PlayerColor.BLUE	), true);
-			Lib.pln("  Lauftzeit: " + (timeEnd - timeStart) + "ms. Suchtiefe " + Consts.ALPHABETA_DEPTH + " Aufrufe " + aufrufe, true);
+			Lib.pln("  Lauftzeit: " + (timeEnd - timeStart) + "ms. Suchtiefe " + Helper.ALPHABETA_DEPTH + " Aufrufe " + aufrufe, true);
 		}
 	}
 
