@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import sc.framework.plugins.Player;
 import sc.player2020.Starter;
+import sc.plugin2020.Board;
 import sc.plugin2020.DragMove;
 import sc.plugin2020.GameState;
 import sc.plugin2020.IGameHandler;
@@ -197,42 +198,16 @@ public class BeatMeBot implements IGameHandler {
 			
 			// Eigene Insekten
 			if (field.getFieldState().toString() == current.toString()) {
-				// Ameisenplage ist immer gut
-				if (field.getPieces().get(0).getType() == PieceType.ANT) {
-					value += 2;
-				}
-				// Bitte eigene Bienenkoenigin nicht surrounden
-				if (Lib.fieldContainsPiece(field, PieceType.BEE)) {
-					int beeNeighbors = 0;
-					List<Field> beeList = Lib.getNeighbours(this.gameState.getBoard(), field);
-					for (Field beeGuard : beeList) {
-						if (beeGuard.getFieldState() != FieldState.EMPTY) {
-							beeNeighbors++;
-						}
-					}
-					if (beeNeighbors > 2) {
-						value -= Math.pow(2, beeNeighbors);
-					}
-				}
-				
+				value -= Helper.logic1OwnQueenSurround(this.gameState.getBoard(), field);
+				value += Helper.logic3CountOwnAnts(field);
+				value += Helper.logic4StepOnQueen(this.gameState.getBoard(), field);
 				// Eigener Mistkaefer auf gegnerischer Koenigin is geil!
 			}
 			
 			// Gegnerische Mückenplage	
 			if (field.getFieldState().toString() == opponent.toString()) {
-				if (Lib.fieldContainsPiece(field, PieceType.BEE)) {
-					int beeNeighbors = 0;
-					List<Field> beeList = Lib.getNeighbours(this.gameState.getBoard(), field);
-					for (Field beeGuard : beeList) {
-						if (beeGuard.getFieldState() != FieldState.EMPTY) {
-							System.out.println("BEEGUARD: " + beeGuard.toString());
-							beeNeighbors++;
-						}
-					}
-					if (beeNeighbors > 2) {
-						value += Math.pow(2, beeNeighbors + 1);
-					}
-				}
+				value += Helper.logic2OpponentQueenSurround(this.gameState.getBoard(), field);
+				value -= Helper.logic4StepOnQueen(this.gameState.getBoard(), field);
 			}
 		} // end of fieldList
 		

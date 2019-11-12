@@ -11,9 +11,7 @@ import sc.plugin2020.Move;
 import sc.plugin2020.Piece;
 import sc.plugin2020.PieceType;
 import sc.plugin2020.SetMove;
-import sc.shared.PlayerColor;
 import sc.plugin2020.util.CubeCoordinates;
-import sc.plugin2020.util.Direction;
 import sc.plugin2020.util.GameRuleLogic;;
 
 public class Lib {
