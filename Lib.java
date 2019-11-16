@@ -309,4 +309,15 @@ public class Lib {
 		}
 		return false;
 	}
+	
+	public static FieldState opponentFieldState(FieldState fieldState) {
+		switch(fieldState) {
+		case BLUE:
+			return FieldState.RED;
+		case RED:
+			return FieldState.BLUE;
+		default:
+			return fieldState;
+		}
+	}
 }

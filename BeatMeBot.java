@@ -201,13 +201,14 @@ public class BeatMeBot implements IGameHandler {
 				value -= Helper.logic1OwnQueenSurround(this.gameState.getBoard(), field);
 				value += Helper.logic3CountOwnAnts(field);
 				value += Helper.logic4StepOnQueen(this.gameState.getBoard(), field);
-				// Eigener Mistkaefer auf gegnerischer Koenigin is geil!
+				value += Helper.logic5BlocksFieldBugs(this.gameState.getBoard(), field);
 			}
 			
 			// Gegnerische Mückenplage	
 			if (field.getFieldState().toString() == opponent.toString()) {
 				value += Helper.logic2OpponentQueenSurround(this.gameState.getBoard(), field);
 				value -= Helper.logic4StepOnQueen(this.gameState.getBoard(), field);
+				value -= Helper.logic5BlocksFieldBugs(this.gameState.getBoard(), field);
 			}
 		} // end of fieldList
 		

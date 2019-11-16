@@ -1,6 +1,7 @@
 package sc.player2020.logic;
 
 import sc.plugin2020.PieceType;
+import sc.shared.PlayerColor;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import sc.plugin2020.FieldState;
 import sc.plugin2020.Piece;
 
 public class Helper {
+	
 	// GLOBAL Constants
 	public static int ALPHABETA_DEPTH = 3;	
 	
@@ -107,4 +109,21 @@ public class Helper {
 	 * Wenn unsere ANT fremde Viecher blockiert, ist cool!
 	 * Je mehr blockiert werden, desto besser...
 	 */
+	public static int logic5BlocksFieldBugs(Board board, Field field) {
+		List<Piece> pieces = field.getPieces();
+		FieldState own = field.getFieldState();
+		if (pieces.get(pieces.size()-1).getType() != PieceType.BEE) {
+			List<Field> neighbors = Lib.getNeighbours(board, field);
+			for (Field neighbor : neighbors) {
+				// Bei eigenen Kaefern, blockieren wir evtl nicht so viel
+				if (neighbor.getFieldState() == own) {
+					return 0;
+				}
+				if (neighbor.getFieldState() == Lib.opponentFieldState(own)) {
+					return 10;
+				}
+			}
+		}
+		return 0;
+	}
 }
