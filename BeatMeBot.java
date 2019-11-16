@@ -1,19 +1,12 @@
 package sc.player2020.logic;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import sc.framework.plugins.Player;
 import sc.player2020.Starter;
-import sc.plugin2020.Board;
-import sc.plugin2020.DragMove;
 import sc.plugin2020.GameState;
 import sc.plugin2020.IGameHandler;
 import sc.plugin2020.Field;
-import sc.plugin2020.FieldState;
 import sc.plugin2020.Move;
 import sc.plugin2020.SetMove;
-import sc.plugin2020.SkipMove;
 import sc.plugin2020.Piece;
 import sc.plugin2020.PieceType;
 import sc.plugin2020.util.CubeCoordinates;
@@ -42,9 +35,12 @@ public class BeatMeBot implements IGameHandler {
   private int aufrufe;
   private Move bestMove;
   private String bestValue;
+  private int bestNo;
   private List<String> bestMoveRating = new ArrayList<String>();
   private String[] alphaBetaMoveList = new String[Helper.ALPHABETA_DEPTH];
   private List<String> outPut = new ArrayList<String>();
+  private long timeAlphaBeta;
+  private boolean timeOut = false;
 
   /**
    * Erzeugt ein neues Strategieobjekt, das zufaellige Zuege taetigt.
@@ -67,8 +63,10 @@ public class BeatMeBot implements IGameHandler {
    */
   @Override
   public void onRequestAction() {
-    
-    final long timeStart = System.currentTimeMillis();
+    // time for TimeOut
+	final long timeStart = System.currentTimeMillis();
+	this.timeAlphaBeta = timeStart;
+	
     outPut.clear();
 
     Lib.printHeader(gameState.getTurn(), Helper.PRINT_HEADER);
@@ -118,6 +116,10 @@ public class BeatMeBot implements IGameHandler {
 
 	private int alphaBeta(int alpha, int beta, int tiefe) throws InvalidGameStateException, InvalidMoveException {
 		++aufrufe;
+		// timeOut
+		if (this.timeOut) {
+			return alpha;
+		}
 		// Abbruchkriterium
 		if ((tiefe == 0) || endOfGame()) {
 			int value = rateAlphaBeta();
@@ -140,6 +142,14 @@ public class BeatMeBot implements IGameHandler {
 		if (moves.size() == 0) {
 			//bestMove = new SkipMove(); // TODO Constructor is private?
 		}
+		
+		// timeOut
+		if (System.currentTimeMillis() - this.timeAlphaBeta >= Helper.TIMEOUTTIME) {
+			System.out.println(System.currentTimeMillis() - this.timeAlphaBeta + " Time Out");
+			System.out.println(this.bestMove.toString());
+			this.timeOut = true;
+			return 0;
+		}
 
 		for (Move move : moves) {
 			alphaBetaMoveList[Helper.ALPHABETA_DEPTH - tiefe] = move.toString();
@@ -151,32 +161,30 @@ public class BeatMeBot implements IGameHandler {
 				if ((wert > alpha) && (wert < beta)) {
 					wert = -alphaBeta(-beta, -wert, tiefe - 1);
 				}
-			} else
+			} else {
 				wert = -alphaBeta(-beta, -alpha, tiefe - 1);
+			}
 			this.gameState = g; // ?
 			if (wert > best) {
-				if (tiefe == Helper.ALPHABETA_DEPTH) {
-					// ZUG KOPIEREN? GEHT DAS SO?
-					if (move.toString().substring(0, 1).equals("S")) { // SetMove
-						SetMove setMove = (SetMove) move;
-						bestMove = new SetMove(setMove.getPiece(), move.getDestination());
-						bestValue = String.valueOf(wert);
-					} else {
-						DragMove dragMove = (DragMove) move;
-						bestMove = new DragMove(dragMove.getStart(), move.getDestination());
-						bestValue = String.valueOf(wert);
-					}
-					outPut.add("NEW BEST MOVE: " + bestMove.toString() + " Value: " + best);
-				}
 				if (wert >= beta) {
 					return wert;
 				}
 				best = wert;
+				if (tiefe == Helper.ALPHABETA_DEPTH) {
+					bestMove = Lib.copyMove(move);
+					bestValue = String.valueOf(wert);
+					bestNo = aufrufe;
+					outPut.add("NEW BEST MOVE: " + bestMove.toString() + " Value: " + best);
+				}
 
 				if (wert > alpha) {
 					alpha = wert;
 					PVgefunden = true;
 				}
+			}
+			// timeOut
+			if (this.timeOut) {
+				return alpha;
 			}
 		}
 		return best;
@@ -247,6 +255,7 @@ public class BeatMeBot implements IGameHandler {
 			Lib.pln("", true);
 			Lib.pln("***S*U*M*M*A*R*Y***", true);
 			Lib.pln("  Best Move: " + bestMove.toString() + " - Value: " + bestValue, true);
+			Lib.pln("  Aufruf: " + bestNo, true);
 			Lib.pln("  Punkte Rot: " + this.gameState.getPointsForPlayer(PlayerColor.RED), true);
 			Lib.pln("  Punkte Blau: " + this.gameState.getPointsForPlayer(PlayerColor.BLUE	), true);
 			Lib.pln("  Lauftzeit: " + (timeEnd - timeStart) + "ms. Suchtiefe " + Helper.ALPHABETA_DEPTH + " Aufrufe " + aufrufe, true);

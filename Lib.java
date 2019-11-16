@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sc.plugin2020.Board;
+import sc.plugin2020.DragMove;
 import sc.plugin2020.Field;
 import sc.plugin2020.FieldState;
 import sc.plugin2020.GameState;
@@ -318,6 +319,16 @@ public class Lib {
 			return FieldState.BLUE;
 		default:
 			return fieldState;
+		}
+	}
+	
+	public static Move copyMove(Move move) {
+		if (move.toString().substring(0, 1).equals("S")) { // SetMove
+			SetMove setMove = (SetMove) move;
+			return new SetMove(setMove.getPiece(), move.getDestination());
+		} else {
+			DragMove dragMove = (DragMove) move;
+			return new DragMove(dragMove.getStart(), move.getDestination());
 		}
 	}
 }

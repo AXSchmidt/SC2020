@@ -1,7 +1,6 @@
 package sc.player2020.logic;
 
 import sc.plugin2020.PieceType;
-import sc.shared.PlayerColor;
 
 import java.util.List;
 
@@ -14,6 +13,7 @@ public class Helper {
 	
 	// GLOBAL Constants
 	public static int ALPHABETA_DEPTH = 3;	
+	public static int TIMEOUTTIME = 1890;
 	
 	// PRINT Constants
 	public static boolean PRINT_ERROR = true;
