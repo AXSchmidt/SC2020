@@ -51,9 +51,9 @@ public class Helper {
 				}
 			}
 			if (beeNeighbors > 2) {
-				int rating = (int) Math.pow(2, beeNeighbors);
+				int rating = (int) -Math.pow(2, beeNeighbors);
 				result.value += rating;
-				result.rate.add("  Own Queen Surround: " + rating + field.toString());
+				result.rate.add("  Own Queen Surround: " + rating + " " + field.toString());
 			}
 		}	
 		return result;
@@ -75,7 +75,7 @@ public class Helper {
 			if (beeNeighbors > 2) {
 				int rating = (int) Math.pow(2, beeNeighbors + 1);
 				result.value += rating;
-				result.rate.add("  Opponent Queen Surround: " + rating + field.toString());
+				result.rate.add("  Opponent Queen Surround: " + rating + " " + field.toString());
 			}
 		}	
 		return result;
@@ -89,9 +89,9 @@ public class Helper {
 		RateHelper result = new RateHelper(rate);
 		List<Piece> pieces = field.getPieces();
 		if (field.getPieces().get(pieces.size()-1).getType() == PieceType.ANT) {
-			int rating = 3;
+			int rating = 3 * rate.isOwn;
 			result.value += rating;
-			result.rate.add("  Count Own Ants: " + rating + field.toString());
+			result.rate.add("  Count Own Ants: " + rating + " " + field.toString());
 		}
 		return result;
 	}
@@ -107,9 +107,9 @@ public class Helper {
 			for (int i = 0; i < pieces.size() - 1; i++) {
 				if (pieces.get(i).getType() == PieceType.BEE) {
 					if (pieces.get(i).getOwner() != pieces.get(pieces.size() - 1).getOwner()) {
-						int rating = 10;
+						int rating = 10 * rate.isOwn;
 						result.value += rating;
-						result.rate.add("  Step On Queen: " + rating + field.toString());
+						result.rate.add("  Step On Queen: " + rating + " " + field.toString());
 					}
 				}
 			}			
@@ -125,6 +125,8 @@ public class Helper {
 		RateHelper result = new RateHelper(rate);
 		List<Piece> pieces = field.getPieces();
 		FieldState own = field.getFieldState();
+		int rating = 0;
+		String rateStr = "";
 		if (pieces.get(pieces.size()-1).getType() != PieceType.BEE) {
 			List<Field> neighbors = Lib.getNeighbours(board, field);
 			for (Field neighbor : neighbors) {
@@ -133,12 +135,14 @@ public class Helper {
 					return result;
 				}
 				if (neighbor.getFieldState() == Lib.opponentFieldState(own)) {
-					int rating = 10;
-					result.value += rating;
-					result.rate.add("  Block Bugs: " + rating + field.toString());
-					return result;
+				    rating = 10 * rate.isOwn;
+				    rateStr = "  Block Bugs: " + rating + " " + field.toString();
 				}
 			}
+		}
+		result.value += rating;
+		if (rateStr != "") {
+			result.rate.add(rateStr);
 		}
 		return result;
 	}

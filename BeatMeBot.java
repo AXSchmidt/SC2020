@@ -211,7 +211,7 @@ public class BeatMeBot implements IGameHandler {
 			
 			// Eigene Insekten
 			if (field.getFieldState().toString() == current.toString()) {
-				rateHelper.current = true;
+				rateHelper.isOwn = 1;
 				rateHelper = Helper.logic1OwnQueenSurround(rateHelper, this.gameState.getBoard(), field);
 				rateHelper = Helper.logic3CountOwnAnts(rateHelper, field);
 				rateHelper = Helper.logic4StepOnQueen(rateHelper, field);
@@ -220,7 +220,7 @@ public class BeatMeBot implements IGameHandler {
 			
 			// Gegnerische Mückenplage	
 			if (field.getFieldState().toString() == opponent.toString()) {
-				rateHelper.current = false;
+				rateHelper.isOwn = -1;
 				rateHelper = Helper.logic2OpponentQueenSurround(rateHelper, this.gameState.getBoard(), field);
 				rateHelper = Helper.logic4StepOnQueen(rateHelper, field);
 				rateHelper = Helper.logic5BlockBugs(rateHelper, this.gameState.getBoard(), field);

@@ -6,18 +6,18 @@ import java.util.List;
 public class RateHelper {
 	public int value;
 	public List<String> rate  = new ArrayList<String>();
-	public boolean current;
+	public int isOwn;
 	
 	public RateHelper() {
 		value = 0;
 		rate.clear();
-		current = true;
+		isOwn = 1;
 	}
 	
 	public RateHelper(RateHelper rateHelper) {
 		value = rateHelper.value;
 		rate.clear();
 		rate.addAll(rateHelper.rate);
-		current = true;
+		isOwn = 1;
 	}
 }
