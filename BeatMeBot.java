@@ -4,6 +4,7 @@ import sc.framework.plugins.Player;
 import sc.player2020.Starter;
 import sc.plugin2020.GameState;
 import sc.plugin2020.IGameHandler;
+import sc.plugin2020.Board;
 import sc.plugin2020.Field;
 import sc.plugin2020.Move;
 import sc.plugin2020.SetMove;
@@ -36,6 +37,7 @@ public class BeatMeBot implements IGameHandler {
   private Move bestMove;
   private String bestValue;
   private int bestNo;
+  private List<String> moveRating = new ArrayList<String>();
   private List<String> bestMoveRating = new ArrayList<String>();
   private String[] alphaBetaMoveList = new String[Helper.ALPHABETA_DEPTH];
   private List<String> outPut = new ArrayList<String>();
@@ -173,6 +175,8 @@ public class BeatMeBot implements IGameHandler {
 				if (tiefe == Helper.ALPHABETA_DEPTH) {
 					bestMove = Lib.copyMove(move);
 					bestValue = String.valueOf(wert);
+					bestMoveRating.clear();
+					bestMoveRating.addAll(moveRating);
 					bestNo = aufrufe;
 					outPut.add("NEW BEST MOVE: " + bestMove.toString() + " Value: " + best);
 				}
@@ -192,8 +196,9 @@ public class BeatMeBot implements IGameHandler {
 
 	private int rateAlphaBeta() {
 		printAlphaBetaBoard();
+		
+		RateHelper rateHelper = new RateHelper();
 
-		int value = 0;
 		PlayerColor current = this.gameState.getCurrentPlayer().getColor();
 		if (Helper.ALPHABETA_DEPTH % 2 != 0) {
 			current = this.gameState.getCurrentPlayer().getColor().opponent();
@@ -206,24 +211,28 @@ public class BeatMeBot implements IGameHandler {
 			
 			// Eigene Insekten
 			if (field.getFieldState().toString() == current.toString()) {
-				value -= Helper.logic1OwnQueenSurround(this.gameState.getBoard(), field);
-				value += Helper.logic3CountOwnAnts(field);
-				value += Helper.logic4StepOnQueen(this.gameState.getBoard(), field);
-				value += Helper.logic5BlocksFieldBugs(this.gameState.getBoard(), field);
-			}
+				rateHelper.current = true;
+				rateHelper = Helper.logic1OwnQueenSurround(rateHelper, this.gameState.getBoard(), field);
+				rateHelper = Helper.logic3CountOwnAnts(rateHelper, field);
+				rateHelper = Helper.logic4StepOnQueen(rateHelper, field);
+				rateHelper = Helper.logic5BlockBugs(rateHelper, this.gameState.getBoard(), field);
+				}
 			
 			// Gegnerische Mückenplage	
 			if (field.getFieldState().toString() == opponent.toString()) {
-				value += Helper.logic2OpponentQueenSurround(this.gameState.getBoard(), field);
-				value -= Helper.logic4StepOnQueen(this.gameState.getBoard(), field);
-				value -= Helper.logic5BlocksFieldBugs(this.gameState.getBoard(), field);
-			}
+				rateHelper.current = false;
+				rateHelper = Helper.logic2OpponentQueenSurround(rateHelper, this.gameState.getBoard(), field);
+				rateHelper = Helper.logic4StepOnQueen(rateHelper, field);
+				rateHelper = Helper.logic5BlockBugs(rateHelper, this.gameState.getBoard(), field);
+				}
 		} // end of fieldList
 		
 		if (Helper.ALPHABETA_DEPTH % 2 != 0) {
-			value = -value;
+			rateHelper.value = -rateHelper.value;
 		}
-		return value;
+		moveRating.clear();
+		moveRating.addAll(rateHelper.rate);
+		return rateHelper.value;
 	}
 
 	private boolean endOfGame() {
@@ -255,6 +264,9 @@ public class BeatMeBot implements IGameHandler {
 			Lib.pln("", true);
 			Lib.pln("***S*U*M*M*A*R*Y***", true);
 			Lib.pln("  Best Move: " + bestMove.toString() + " - Value: " + bestValue, true);
+			for (String moveRating: bestMoveRating) {
+				Lib.pln(moveRating, true);
+			}
 			Lib.pln("  Aufruf: " + bestNo, true);
 			Lib.pln("  Punkte Rot: " + this.gameState.getPointsForPlayer(PlayerColor.RED), true);
 			Lib.pln("  Punkte Blau: " + this.gameState.getPointsForPlayer(PlayerColor.BLUE	), true);

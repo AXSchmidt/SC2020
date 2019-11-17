@@ -326,7 +326,7 @@ public class Lib {
 		if (move.toString().substring(0, 1).equals("S")) { // SetMove
 			SetMove setMove = (SetMove) move;
 			return new SetMove(setMove.getPiece(), move.getDestination());
-		} else {
+		} else { // DragMove
 			DragMove dragMove = (DragMove) move;
 			return new DragMove(dragMove.getStart(), move.getDestination());
 		}
