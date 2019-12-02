@@ -129,12 +129,18 @@ public class Helper {
 		String rateStr = "";
 		if (pieces.get(pieces.size()-1).getType() != PieceType.BEE) {
 			List<Field> neighbors = Lib.getNeighbours(board, field);
+			int neighborHood = 0;
 			for (Field neighbor : neighbors) {
 				// Bei eigenen Kaefern, blockieren wir evtl nicht so viel
 				if (neighbor.getFieldState() == own) {
 					return result;
 				}
 				if (neighbor.getFieldState() == Lib.opponentFieldState(own)) {
+					// Bei mehr als einem zu blockierenden Stein, lohnt es nicht so richtig
+					if (neighborHood > 0) {
+						return result;
+					}
+					neighborHood++;
 					int multi = 0;
 					PieceType oppType = neighbor.getPieces().get(pieces.size()-1).getType();
 					switch(oppType) {
