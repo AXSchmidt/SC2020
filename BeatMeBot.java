@@ -116,7 +116,7 @@ public class BeatMeBot implements IGameHandler {
 		}
 	}
 
-	private int alphaBeta(int alpha, int beta, int tiefe) throws InvalidGameStateException, InvalidMoveException {
+	private double alphaBeta(double alpha, double beta, int tiefe) throws InvalidGameStateException, InvalidMoveException {
 		++aufrufe;
 		// timeOut
 		if (this.timeOut) {
@@ -124,11 +124,11 @@ public class BeatMeBot implements IGameHandler {
 		}
 		// Abbruchkriterium
 		if ((tiefe == 0) || endOfGame()) {
-			int value = rateAlphaBeta();
+			int rating = rateAlphaBeta();
 			if (Helper.PRINT_ALPHABETA_HEADER) {
 				outPut.add("");
 				outPut.add("***N*E*W***M*O*V*E***");
-				outPut.add("Value: " + value + " - Tiefe: " + Helper.ALPHABETA_DEPTH + " - Aufrufe: " + aufrufe + " - Turn: "
+				outPut.add("Value: " + rating + " - Tiefe: " + Helper.ALPHABETA_DEPTH + " - Aufrufe: " + aufrufe + " - Turn: "
 						+ gameState.getTurn() + " - Round: " + gameState.getRound());
 			}
 			if (Helper.PRINT_ALPHABETA_SHOWMOVES) {
@@ -136,11 +136,11 @@ public class BeatMeBot implements IGameHandler {
 					outPut.add(moveStr);
 				}
 			}
-			return value;
+			return rating;
 		}
 		boolean PVgefunden = false;
-		int best = Integer.MIN_VALUE + 1;
-		List<Move> moves = GameRuleLogic.getPossibleMoves(gameState);
+		double best = Integer.MIN_VALUE + 1;
+		List<Move> moves = GameRuleLogic.getPossibleMoves(gameState.clone());
 		if (moves.size() == 0) {
 			//bestMove = new SkipMove(); // TODO Constructor is private?
 		}
@@ -157,32 +157,34 @@ public class BeatMeBot implements IGameHandler {
 			alphaBetaMoveList[Helper.ALPHABETA_DEPTH - tiefe] = move.toString();
 			GameState g = this.gameState.clone();
 			GameRuleLogic.performMove(this.gameState, move);
-			int wert;
+			double value;
 			if (PVgefunden) {
-				wert = -alphaBeta(-alpha - 1, -alpha, tiefe - 1);
-				if ((wert > alpha) && (wert < beta)) {
-					wert = -alphaBeta(-beta, -wert, tiefe - 1);
+				value = -alphaBeta(-alpha - 1, -alpha, tiefe - 1);
+				if ((value > alpha) && (value < beta)) {
+					value = -alphaBeta(-beta, -value, tiefe - 1);
 				}
 			} else {
-				wert = -alphaBeta(-beta, -alpha, tiefe - 1);
+				value = -alphaBeta(-beta, -alpha, tiefe - 1);
 			}
-			this.gameState = g; // ?
-			if (wert > best) {
-				if (wert >= beta) {
-					return wert;
+			this.gameState = g.clone(); // ?
+			if (value > best) {
+				if (value >= beta) {
+					return value;
 				}
-				best = wert;
+
 				if (tiefe == Helper.ALPHABETA_DEPTH) {
 					bestMove = Lib.copyMove(move);
-					bestValue = String.valueOf(wert);
+					bestValue = String.valueOf(value);
 					bestMoveRating.clear();
 					bestMoveRating.addAll(moveRating);
 					bestNo = aufrufe;
 					outPut.add("NEW BEST MOVE: " + bestMove.toString() + " Value: " + best);
 				}
-
-				if (wert > alpha) {
-					alpha = wert;
+				
+				best = value;
+				
+				if (value > alpha) {
+					alpha = value;
 					PVgefunden = true;
 				}
 			}
@@ -231,7 +233,7 @@ public class BeatMeBot implements IGameHandler {
 			rateHelper.value = -rateHelper.value;
 		}
 		moveRating.clear();
-		moveRating.addAll(rateHelper.rate);
+		moveRating.addAll(rateHelper.rateStr);
 		return rateHelper.value;
 	}
 

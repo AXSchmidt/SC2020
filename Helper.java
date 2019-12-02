@@ -12,7 +12,7 @@ import sc.plugin2020.Piece;
 public class Helper {
 	
 	// GLOBAL Constants
-	public static int ALPHABETA_DEPTH = 3;	
+	public static int ALPHABETA_DEPTH = 1;	
 	public static int TIMEOUTTIME = 1890;
 	
 	// PRINT Constants
@@ -53,7 +53,7 @@ public class Helper {
 			if (beeNeighbors > 2) {
 				int rating = (int) -Math.pow(2, beeNeighbors);
 				result.value += rating;
-				result.rate.add("  Own Queen Surround: " + rating + " " + field.toString());
+				result.rateStr.add("  Own Queen Surround: " + rating + " " + field.toString());
 			}
 		}	
 		return result;
@@ -75,7 +75,7 @@ public class Helper {
 			if (beeNeighbors > 2) {
 				int rating = (int) Math.pow(2, beeNeighbors + 1);
 				result.value += rating;
-				result.rate.add("  Opponent Queen Surround: " + rating + " " + field.toString());
+				result.rateStr.add("  Opponent Queen Surround: " + rating + " " + field.toString());
 			}
 		}	
 		return result;
@@ -91,7 +91,7 @@ public class Helper {
 		if (field.getPieces().get(pieces.size()-1).getType() == PieceType.ANT) {
 			int rating = 3 * rate.isOwn;
 			result.value += rating;
-			result.rate.add("  Count Own Ants: " + rating + " " + field.toString());
+			result.rateStr.add("  Count Own Ants: " + rating + " " + field.toString());
 		}
 		return result;
 	}
@@ -109,7 +109,7 @@ public class Helper {
 					if (pieces.get(i).getOwner() != pieces.get(pieces.size() - 1).getOwner()) {
 						int rating = 10 * rate.isOwn;
 						result.value += rating;
-						result.rate.add("  Step On Queen: " + rating + " " + field.toString());
+						result.rateStr.add("  Step On Queen: " + rating + " " + field.toString());
 					}
 				}
 			}			
@@ -135,14 +135,27 @@ public class Helper {
 					return result;
 				}
 				if (neighbor.getFieldState() == Lib.opponentFieldState(own)) {
-				    rating = 10 * rate.isOwn;
+					int multi = 0;
+					PieceType oppType = neighbor.getPieces().get(pieces.size()-1).getType();
+					switch(oppType) {
+					case ANT:
+						multi = 10;
+						break;
+					case BEE:
+						multi = 7;
+						break;
+					default:
+						multi = 3;
+						break;
+					}
+				    rating = multi * rate.isOwn;
 				    rateStr = "  Block Bugs: " + rating + " " + field.toString();
 				}
 			}
 		}
 		result.value += rating;
 		if (rateStr != "") {
-			result.rate.add(rateStr);
+			result.rateStr.add(rateStr);
 		}
 		return result;
 	}

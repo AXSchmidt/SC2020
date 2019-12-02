@@ -5,19 +5,19 @@ import java.util.List;
 
 public class RateHelper {
 	public int value;
-	public List<String> rate  = new ArrayList<String>();
 	public int isOwn;
+	public List<String> rateStr  = new ArrayList<String>();
 	
 	public RateHelper() {
 		value = 0;
-		rate.clear();
 		isOwn = 1;
+		rateStr.clear();
 	}
 	
 	public RateHelper(RateHelper rateHelper) {
 		value = rateHelper.value;
-		rate.clear();
-		rate.addAll(rateHelper.rate);
 		isOwn = 1;
+		rateStr.clear();
+		rateStr.addAll(rateHelper.rateStr);
 	}
 }

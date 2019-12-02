@@ -150,7 +150,8 @@ public class Lib {
 	public static boolean isCoordinatesOnBoard(CubeCoordinates coordinates) {
 		int x = coordinates.getX();
 		int y = coordinates.getY();
-		return ((x >= -5) && (x <= 5) && (y >= -5) && (y <= 5));
+		int z = coordinates.getZ();
+		return ((x >= -5) && (x <= 5) && (y >= -5) && (y <= 5) && (z >= -5) && (z <= 5));
 	}
 	
 	public static List<Field> getAllFields(Board board) {
