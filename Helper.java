@@ -27,9 +27,17 @@ public class Helper {
 	public static boolean PRINT_APLHABETA_SHOWBOARD = false;
 	
 	
-	/*********************
-	 * L * O * G * I * C *
-	 *********************/
+	/************************************************
+	 *     L * O * G * I * C *                      *
+	 *                                              *
+	 * L0: Turn 1 wird BEE gesetzt (ohne AlphaBeta) *
+	 * L1: Wie doll wird eigene BEE umzingelt?      *
+	 * L2: Wir doll wird gegnerische BEE umzingelt? *
+	 * L3: Zaehle eigene Ameisen (Ameisen gut)      *
+	 * L4: Trete mit BEETLE auf BEE (super)         *
+	 * L5: Blocke gegnerische BUGS                  *
+	 *                                              *
+	 ************************************************/
 	
 	/* LOGIC 0:
 	 * Ich setze gleich im ersten Zug (egal ob ich anfange oder nicht) meine BEE,
@@ -97,7 +105,7 @@ public class Helper {
 	}
 	
 	/* LOGIC 4:
-	 * Wenn unser BUG auf der gegnerische BEE sitzt, ist das super, dann koennen
+	 * Wenn unser BEETLE auf der gegnerische BEE sitzt, ist das super, dann koennen
 	 * wir schneller surrounden
 	 */
 	public static RateHelper logic4StepOnQueen(RateHelper rate, Field field) {
