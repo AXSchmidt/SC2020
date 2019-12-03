@@ -216,20 +216,20 @@ public class BeatMeBot implements IGameHandler {
 			// Eigene Insekten
 			if (field.getFieldState().toString() == current.toString()) {
 				rateHelper.isOwn = 1;
-				rateHelper = Helper.logic1OwnQueenSurround(rateHelper, this.gameState.getBoard(), field);
-				rateHelper = Helper.logic3CountOwnAnts(rateHelper, field);
+				rateHelper = Helper.logic1QueenSurround(rateHelper, this.gameState.getBoard(), field);
+				rateHelper = Helper.logic2CountOwnAnts(rateHelper, field);
 				if (oppBeePlaced) {
-					rateHelper = Helper.logic4StepOnQueen(rateHelper, field);
-					rateHelper = Helper.logic5BlockBugs(rateHelper, this.gameState.getBoard(), field);
+					rateHelper = Helper.logic3StepOnQueen(rateHelper, field);
+					rateHelper = Helper.logic4BlockBugs(rateHelper, this.gameState.getBoard(), field);
 				}
 			}
 			
 			// Gegnerische Mückenplage	
 			if (field.getFieldState().toString() == opponent.toString()) {
 				rateHelper.isOwn = -1;
-				rateHelper = Helper.logic2OpponentQueenSurround(rateHelper, this.gameState.getBoard(), field);
-				rateHelper = Helper.logic4StepOnQueen(rateHelper, field);
-				rateHelper = Helper.logic5BlockBugs(rateHelper, this.gameState.getBoard(), field);
+				rateHelper = Helper.logic1QueenSurround(rateHelper, this.gameState.getBoard(), field);
+				rateHelper = Helper.logic3StepOnQueen(rateHelper, field);
+				rateHelper = Helper.logic4BlockBugs(rateHelper, this.gameState.getBoard(), field);
 				}
 		} // end of fieldList
 		

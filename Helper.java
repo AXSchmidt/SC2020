@@ -13,7 +13,7 @@ public class Helper {
 	
 	// GLOBAL Constants
 	public static int ALPHABETA_DEPTH = 1;	
-	public static int TIMEOUTTIME = 1890;
+	public static int TIMEOUTTIME = 1860;
 	
 	// PRINT Constants
 	public static boolean PRINT_ERROR = true;
@@ -31,11 +31,10 @@ public class Helper {
 	 *     L * O * G * I * C *                      *
 	 *                                              *
 	 * L0: Turn 1 wird BEE gesetzt (ohne AlphaBeta) *
-	 * L1: Wie doll wird eigene BEE umzingelt?      *
-	 * L2: Wir doll wird gegnerische BEE umzingelt? *
-	 * L3: Zaehle eigene Ameisen (Ameisen gut)      *
-	 * L4: Trete mit BEETLE auf BEE (super)         *
-	 * L5: Blocke gegnerische BUGS                  *
+	 * L1: Wir doll wird BEE umzingelt?             *
+	 * L2: Zaehle eigene Ameisen (Ameisen gut)      *
+	 * L3: Trete mit BEETLE auf BEE (super)         *
+	 * L4: Blocke gegnerische BUGS                  *
 	 *                                              *
 	 ************************************************/
 	
@@ -44,12 +43,14 @@ public class Helper {
 	 * damit ich moeglichst schnell meine ANTs mobil bekomme
 	 */
 	
+	
 	/* LOGIC 1:
-	 * Je mehr Felder um die eigene BEE belegt sind, desto schlechter ist das Ganze!
-	 * Sollte evtl exponential steigen!
+	 * BEE umzingeln ist super, solange es nicht die eigene ist!
 	 */
-	public static RateHelper logic1OwnQueenSurround(RateHelper rate, Board board, Field field) {
+	public static RateHelper logic1QueenSurround(RateHelper rate, Board board, Field field) {
 		RateHelper result = new RateHelper(rate);
+		List<Piece> pieces = field.getPieces();
+		PieceType blockerBug = pieces.get(pieces.size()-1).getType();
 		if (Lib.fieldContainsPiece(field, PieceType.BEE)) {
 			int beeNeighbors = 0;
 			List<Field> beeList = Lib.getNeighbours(board, field);
@@ -59,56 +60,34 @@ public class Helper {
 				}
 			}
 			if (beeNeighbors > 2) {
-				int rating = (int) -Math.pow(2, beeNeighbors);
+				int rating = -rate.isOwn * (int) Math.pow(2, beeNeighbors + (int) ((rate.isOwn + 1) / 2));
 				result.value += rating;
-				result.rateStr.add("L1 - Own Queen Surround: " + rating + " " + field.toString());
+				result.rateStr.add("L1 - Queen Surround: " + rating + " " + field.toString());
 			}
 		}	
 		return result;
 	}
 	
 	/* LOGIC 2:
-	 * Die gegenerische BEE zu umzingeln ist super 
-	 */
-	public static RateHelper logic2OpponentQueenSurround(RateHelper rate, Board board, Field field) {
-		RateHelper result = new RateHelper(rate);
-		if (Lib.fieldContainsPiece(field, PieceType.BEE)) {
-			int beeNeighbors = 0;
-			List<Field> beeList = Lib.getNeighbours(board, field);
-			for (Field beeGuard : beeList) {
-				if (beeGuard.getFieldState() != FieldState.EMPTY) {
-					beeNeighbors++;
-				}
-			}
-			if (beeNeighbors > 2) {
-				int rating = (int) Math.pow(2, beeNeighbors + 1);
-				result.value += rating;
-				result.rateStr.add("L2 - Opponent Queen Surround: " + rating + " " + field.toString());
-			}
-		}	
-		return result;
-	}
-	
-	/* LOGIC 3:
 	 * Eigene ANT frueh im Spiel zu haben ist von Vorteil, da diese schnell
 	 * gegenrische Steine blocken können
 	 */
-	public static RateHelper logic3CountOwnAnts(RateHelper rate, Field field) {
+	public static RateHelper logic2CountOwnAnts(RateHelper rate, Field field) {
 		RateHelper result = new RateHelper(rate);
 		List<Piece> pieces = field.getPieces();
-		if (field.getPieces().get(pieces.size()-1).getType() == PieceType.ANT) {
+		if (pieces.get(pieces.size()-1).getType() == PieceType.ANT) {
 			int rating = 3 * rate.isOwn;
 			result.value += rating;
-			result.rateStr.add("L3 - Count Own Ants: " + rating + " " + field.toString());
+			result.rateStr.add("L2 - Count Own Ants: " + rating + " " + field.toString());
 		}
 		return result;
 	}
 	
-	/* LOGIC 4:
+	/* LOGIC 3:
 	 * Wenn unser BEETLE auf der gegnerische BEE sitzt, ist das super, dann koennen
 	 * wir schneller surrounden
 	 */
-	public static RateHelper logic4StepOnQueen(RateHelper rate, Field field) {
+	public static RateHelper logic3StepOnQueen(RateHelper rate, Field field) {
 		RateHelper result = new RateHelper(rate);
 		List<Piece> pieces = field.getPieces();
 		if (pieces.size() > 1) {
@@ -117,7 +96,7 @@ public class Helper {
 					if (pieces.get(i).getOwner() != pieces.get(pieces.size() - 1).getOwner()) {
 						int rating = 10 * rate.isOwn;
 						result.value += rating;
-						result.rateStr.add("L4 - Step On Queen: " + rating + " " + field.toString());
+						result.rateStr.add("L3 - Step On Queen: " + rating + " " + field.toString());
 					}
 				}
 			}			
@@ -125,21 +104,23 @@ public class Helper {
 		return result;		
 	}
 	
-	/* LOGIC 5:
+	/* LOGIC 4:
 	 * Wenn unsere ANT fremde Viecher blockiert, ist cool!
 	 * Je mehr blockiert werden, desto besser...
 	 */
-	public static RateHelper logic5BlockBugs(RateHelper rate, Board board, Field field) {
+	public static RateHelper logic4BlockBugs(RateHelper rate, Board board, Field field) {
+		// necessary stuff
 		RateHelper result = new RateHelper(rate);
 		List<Piece> pieces = field.getPieces();
 		FieldState own = field.getFieldState();
 		int rating = 0;
 		String rateStr = "";
+		// Wir wollen alles blocken (außer BEE, das ist ja schon Logic 1/2)
 		if (pieces.get(pieces.size()-1).getType() != PieceType.BEE) {
 			List<Field> neighbors = Lib.getNeighbours(board, field);
 			int neighborHood = 0;
 			for (Field neighbor : neighbors) {
-				// Bei eigenen Kaefern, blockieren wir evtl nicht so viel
+				// Wenn eigene Kaefer in der Naehe sind, bringt blocken nichts
 				if (neighbor.getFieldState() == own) {
 					return result;
 				}
@@ -163,7 +144,7 @@ public class Helper {
 						break;
 					}
 				    rating = multi * rate.isOwn;
-				    rateStr = "L5 - Block Bug " + oppType.toString() + ": " + rating + " " + field.toString();
+				    rateStr = "L4 - Block Bug " + oppType.toString() + ": " + rating + " " + field.toString();
 				}
 			}
 		}
