@@ -22,9 +22,9 @@ public class Helper {
 	public static boolean PRINT_FOOTER = true;	
 	
 	public static boolean PRINT_ALPHABETA = true;
-	public static boolean PRINT_ALPHABETA_HEADER = true;
-	public static boolean PRINT_ALPHABETA_SHOWMOVES = true;
-	public static boolean PRINT_APLHABETA_SHOWBOARD = true;
+	public static boolean PRINT_ALPHABETA_SHOWNEWMOVE = false;
+	public static boolean PRINT_ALPHABETA_SHOWMOVES = false;
+	public static boolean PRINT_APLHABETA_SHOWBOARD = false;
 	
 	
 	/*********************

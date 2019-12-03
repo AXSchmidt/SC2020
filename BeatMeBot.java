@@ -92,7 +92,7 @@ public class BeatMeBot implements IGameHandler {
   }
   
 	private void startAlphaBeta() {
-		outPut.add("  Start AlphaBeta_");
+		outPut.add("*  Start AlphaBeta  *");
 		aufrufe = 0;
 		boolean error = false;
 
@@ -125,7 +125,7 @@ public class BeatMeBot implements IGameHandler {
 		// Abbruchkriterium
 		if ((tiefe == 0) || endOfGame()) {
 			int rating = rateAlphaBeta();
-			if (Helper.PRINT_ALPHABETA_HEADER) {
+			if (Helper.PRINT_ALPHABETA_SHOWNEWMOVE) {
 				outPut.add("");
 				outPut.add("***N*E*W***M*O*V*E***");
 				outPut.add("Value: " + rating + " - Tiefe: " + Helper.ALPHABETA_DEPTH + " - Aufrufe: " + aufrufe + " - Turn: "
@@ -206,9 +206,11 @@ public class BeatMeBot implements IGameHandler {
 			current = this.gameState.getCurrentPlayer().getColor().opponent();
 		}
 		PlayerColor opponent = current.opponent();
-		outPut.add("You: "+current.toString());
 
 		List<Field> fieldList = Lib.getAllFields(this.gameState.getBoard());
+		
+		boolean oppBeePlaced = Lib.isBeePlaced(fieldList, opponent);
+		
 		for (Field field : fieldList) {
 			
 			// Eigene Insekten
@@ -216,9 +218,11 @@ public class BeatMeBot implements IGameHandler {
 				rateHelper.isOwn = 1;
 				rateHelper = Helper.logic1OwnQueenSurround(rateHelper, this.gameState.getBoard(), field);
 				rateHelper = Helper.logic3CountOwnAnts(rateHelper, field);
-				rateHelper = Helper.logic4StepOnQueen(rateHelper, field);
-				rateHelper = Helper.logic5BlockBugs(rateHelper, this.gameState.getBoard(), field);
+				if (oppBeePlaced) {
+					rateHelper = Helper.logic4StepOnQueen(rateHelper, field);
+					rateHelper = Helper.logic5BlockBugs(rateHelper, this.gameState.getBoard(), field);
 				}
+			}
 			
 			// Gegnerische Mückenplage	
 			if (field.getFieldState().toString() == opponent.toString()) {

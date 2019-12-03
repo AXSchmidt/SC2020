@@ -27,9 +27,9 @@ public class Lib {
 	public static void printHeader(int turn, boolean print) {
 	    pln("", print);
 	    pln("", print);
-	    pln("* * * * * * * * * * * * * *", print);
-	    pln("* N e u e   R u n d e   " + turn + " *", print);
-	    pln("* * * * * * * * * * * * * *", print);
+	    pln("* * * * * * * * * * * * * * *", print);
+	    pln("* N e u e   R u n d e   " + turn + "   *", print);
+	    pln("* * * * * * * * * * * * * * *", print);
 	    pln("", print);
 	}
 	
@@ -338,11 +338,9 @@ public class Lib {
 		for (Field field : fieldList) {
 			if (field.getFieldState().toString() == playerColor.toString()) {
 				List<Piece> pieces = field.getPieces();
-				if (pieces.size() > 1) {
-					for (int i = 0; i < pieces.size() - 1; i++) {
-						if (pieces.get(i).getType() == PieceType.BEE) {
-							return true;
-						}
+				for (int i = 0; i < pieces.size(); i++) {
+					if (pieces.get(i).getType() == PieceType.BEE) {
+						return true;						
 					}
 				}
 			}
