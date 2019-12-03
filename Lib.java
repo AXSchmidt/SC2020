@@ -13,7 +13,8 @@ import sc.plugin2020.Piece;
 import sc.plugin2020.PieceType;
 import sc.plugin2020.SetMove;
 import sc.plugin2020.util.CubeCoordinates;
-import sc.plugin2020.util.GameRuleLogic;;
+import sc.plugin2020.util.GameRuleLogic;
+import sc.shared.PlayerColor;;
 
 public class Lib {
 	
@@ -331,5 +332,21 @@ public class Lib {
 			DragMove dragMove = (DragMove) move;
 			return new DragMove(dragMove.getStart(), move.getDestination());
 		}
+	}
+	
+	public static boolean isBeePlaced(List<Field> fieldList, PlayerColor playerColor) {
+		for (Field field : fieldList) {
+			if (field.getFieldState().toString() == playerColor.toString()) {
+				List<Piece> pieces = field.getPieces();
+				if (pieces.size() > 1) {
+					for (int i = 0; i < pieces.size() - 1; i++) {
+						if (pieces.get(i).getType() == PieceType.BEE) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 }
