@@ -155,7 +155,7 @@ public class Helper {
 						break;
 					}
 				    rating = multi * rate.isOwn;
-				    rateStr = "L5 - Block Bug" + oppType.toString() + ": " + rating + " " + field.toString();
+				    rateStr = "L5 - Block Bug " + oppType.toString() + ": " + rating + " " + field.toString();
 				}
 			}
 		}
