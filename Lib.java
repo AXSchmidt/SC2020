@@ -25,11 +25,11 @@ public class Lib {
 	
 	public static void printHeader(int turn, boolean print) {
 	    pln("", print);
-	    pln("* * * * * * * * * * * *", print);
-	    pln("* N e u e   R u n d e *", print);
-	    pln("* * * * * * * * * * * *", print);
 	    pln("", print);
-	    pln("  Turn: " + turn, print);
+	    pln("* * * * * * * * * * * * * *", print);
+	    pln("* N e u e   R u n d e   " + turn + " *", print);
+	    pln("* * * * * * * * * * * * * *", print);
+	    pln("", print);
 	}
 	
 	private static int getDistance(CubeCoordinates p1, CubeCoordinates p2) {

@@ -265,14 +265,16 @@ public class BeatMeBot implements IGameHandler {
 			final long timeEnd = System.currentTimeMillis();
 			Lib.pln("", true);
 			Lib.pln("***S*U*M*M*A*R*Y***", true);
-			Lib.pln("  Best Move: " + bestMove.toString() + " - Value: " + bestValue, true);
+			Lib.pln("  Best Move: " + bestMove.toString() + "; Value: " + bestValue, true);
+			int c = 0;
 			for (String moveRating: bestMoveRating) {
-				Lib.pln(moveRating, true);
+				c++;
+				Lib.pln("  " + c + ". " + moveRating, true);
 			}
-			Lib.pln("  Aufruf: " + bestNo, true);
+			Lib.pln("  Aufruf: " + bestNo + "/" + aufrufe + " (Suchetiefe " + Helper.ALPHABETA_DEPTH + ")", true);
 			Lib.pln("  Punkte Rot: " + this.gameState.getPointsForPlayer(PlayerColor.RED), true);
 			Lib.pln("  Punkte Blau: " + this.gameState.getPointsForPlayer(PlayerColor.BLUE	), true);
-			Lib.pln("  Lauftzeit: " + (timeEnd - timeStart) + "ms. Suchtiefe " + Helper.ALPHABETA_DEPTH + " Aufrufe " + aufrufe, true);
+			Lib.pln("  Lauftzeit: " + (timeEnd - timeStart) + "ms.", true);
 		}
 	}
 

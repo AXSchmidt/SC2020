@@ -53,7 +53,7 @@ public class Helper {
 			if (beeNeighbors > 2) {
 				int rating = (int) -Math.pow(2, beeNeighbors);
 				result.value += rating;
-				result.rateStr.add("  Own Queen Surround: " + rating + " " + field.toString());
+				result.rateStr.add("L1 - Own Queen Surround: " + rating + " " + field.toString());
 			}
 		}	
 		return result;
@@ -75,7 +75,7 @@ public class Helper {
 			if (beeNeighbors > 2) {
 				int rating = (int) Math.pow(2, beeNeighbors + 1);
 				result.value += rating;
-				result.rateStr.add("  Opponent Queen Surround: " + rating + " " + field.toString());
+				result.rateStr.add("L2 - Opponent Queen Surround: " + rating + " " + field.toString());
 			}
 		}	
 		return result;
@@ -91,7 +91,7 @@ public class Helper {
 		if (field.getPieces().get(pieces.size()-1).getType() == PieceType.ANT) {
 			int rating = 3 * rate.isOwn;
 			result.value += rating;
-			result.rateStr.add("  Count Own Ants: " + rating + " " + field.toString());
+			result.rateStr.add("L3 - Count Own Ants: " + rating + " " + field.toString());
 		}
 		return result;
 	}
@@ -109,7 +109,7 @@ public class Helper {
 					if (pieces.get(i).getOwner() != pieces.get(pieces.size() - 1).getOwner()) {
 						int rating = 10 * rate.isOwn;
 						result.value += rating;
-						result.rateStr.add("  Step On Queen: " + rating + " " + field.toString());
+						result.rateStr.add("L4 - Step On Queen: " + rating + " " + field.toString());
 					}
 				}
 			}			
@@ -155,7 +155,7 @@ public class Helper {
 						break;
 					}
 				    rating = multi * rate.isOwn;
-				    rateStr = "  Block Bugs: " + rating + " " + field.toString();
+				    rateStr = "L5 - Block Bug" + oppType.toString() + ": " + rating + " " + field.toString();
 				}
 			}
 		}
