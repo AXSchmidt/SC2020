@@ -31,7 +31,7 @@ public class Helper {
 	 *     L * O * G * I * C *                      *
 	 *                                              *
 	 * L0: Turn 1 wird BEE gesetzt (ohne AlphaBeta) *
-	 * L1: Wir doll wird BEE umzingelt?             *
+	 * L1: Wie doll wird BEE umzingelt?             *
 	 * L2: Zaehle eigene Ameisen (Ameisen gut)      *
 	 * L3: Trete mit BEETLE auf BEE (super)         *
 	 * L4: Blocke gegnerische BUGS                  *
@@ -134,7 +134,7 @@ public class Helper {
 					PieceType oppType = neighbor.getPieces().get(pieces.size()-1).getType();
 					switch(oppType) {
 					case ANT:
-						multi = 10;
+						multi = 16;
 						break;
 					case BEE:
 						multi = 7;
